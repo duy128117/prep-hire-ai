@@ -1,0 +1,13 @@
+services:
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - be_shared
+
+networks:
+  be_shared:
+    external: true
+    name: nextstep_be_default

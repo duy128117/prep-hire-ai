@@ -1,0 +1,51 @@
+{
+  "model": "TF-IDF + Ridge multi-output candidate answer scorer",
+  "label_source": "multi_llm_consensus_pseudo_labels",
+  "dataset_rows": 300,
+  "context_groups": 102,
+  "train_rows": 240,
+  "test_rows": 60,
+  "split_strategy": "group_by_benchmark_case",
+  "overall_pseudo_label_metrics": {
+    "mae": 0.851209,
+    "rmse": 1.068582,
+    "spearman": 0.738759
+  },
+  "by_criterion": {
+    "answer_relevance": {
+      "mae": 0.917378,
+      "rmse": 1.220845,
+      "spearman": 0.783696
+    },
+    "technical_correctness": {
+      "mae": 0.858996,
+      "rmse": 1.086181,
+      "spearman": 0.764731
+    },
+    "reasoning_depth": {
+      "mae": 0.727505,
+      "rmse": 0.86944,
+      "spearman": 0.836915
+    },
+    "evidence_specificity": {
+      "mae": 0.972351,
+      "rmse": 1.129701,
+      "spearman": 0.794476
+    },
+    "clarity": {
+      "mae": 0.589221,
+      "rmse": 0.757689,
+      "spearman": 0.616165
+    },
+    "consistency": {
+      "mae": 1.025682,
+      "rmse": 1.268075,
+      "spearman": 0.542504
+    },
+    "criterion_score": {
+      "mae": 0.867331,
+      "rmse": 1.052886,
+      "spearman": 0.795435
+    }
+  }
+}

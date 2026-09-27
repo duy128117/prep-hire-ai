@@ -1,0 +1,2790 @@
+{
+  "meta": {
+    "description": "Skill relation groups inferred from job co-occurrence + aliases + text similarity.",
+    "difficulty_strategy": "Higher baseline_hours means harder skill; transfer becomes directional within each group.",
+    "min_co_occur": 2,
+    "min_conditional_co_occur": 0.35,
+    "min_edge_score": 0.45,
+    "total_skills": 164,
+    "total_groups": 1,
+    "total_edges": 204
+  },
+  "groups": [
+    {
+      "group_id": 1,
+      "size": 66,
+      "skills": [
+        ".NET",
+        ".NET Core",
+        "AI",
+        "API",
+        "Agile & Scrum",
+        "Automation Tester",
+        "Blockchain",
+        "BrSE",
+        "Business Analyst",
+        "Business/Sales",
+        "C#",
+        "C++",
+        "C/C++",
+        "DNS",
+        "Data Engineer",
+        "Database",
+        "Docker",
+        "English",
+        "Go",
+        "HTML",
+        "HTML5",
+        "IT Security",
+        "IT Service",
+        "IT Support",
+        "JSON",
+        "Java",
+        "Java Spring Boot",
+        "JavaScript",
+        "Korean",
+        "Kotlin",
+        "Linux",
+        "MS SQL",
+        "Machine Learning",
+        "Microservices",
+        "Mobile",
+        "MongoDB",
+        "Network",
+        "Node.js",
+        "PHP",
+        "PostgreSQL",
+        "Project Manager",
+        "PyTorch",
+        "Python",
+        "QA",
+        "QA/QC",
+        "REST API",
+        "React",
+        "React Native",
+        "React/Typescript",
+        "Restful Api",
+        "SOC",
+        "SQL",
+        "Security Engineer",
+        "Selenium",
+        "Spring Boot",
+        "Swift",
+        "System",
+        "System Engineer",
+        "System Security",
+        "Tensorflow",
+        "Tester",
+        "TypeScript",
+        "UI/UX",
+        "Unix",
+        "Vue.js",
+        "WPF"
+      ],
+      "ordered_skills": [
+        {
+          "skill": "Machine Learning",
+          "difficulty_rank": 1,
+          "difficulty_hours": 90,
+          "reference_range_hours": [
+            60,
+            140
+          ],
+          "source_note": "baseline_from_reference"
+        },
+        {
+          "skill": "Java",
+          "difficulty_rank": 2,
+          "difficulty_hours": 80,
+          "reference_range_hours": [
+            55,
+            110
+          ],
+          "source_note": "baseline_from_reference"
+        },
+        {
+          "skill": "Python",
+          "difficulty_rank": 3,
+          "difficulty_hours": 70,
+          "reference_range_hours": [
+            50,
+            90
+          ],
+          "source_note": "baseline_from_reference"
+        },
+        {
+          "skill": "JavaScript",
+          "difficulty_rank": 4,
+          "difficulty_hours": 65,
+          "reference_range_hours": [
+            40,
+            95
+          ],
+          "source_note": "baseline_from_reference"
+        },
+        {
+          "skill": "React",
+          "difficulty_rank": 5,
+          "difficulty_hours": 60,
+          "reference_range_hours": [
+            40,
+            85
+          ],
+          "source_note": "baseline_from_reference"
+        },
+        {
+          "skill": "Node.js",
+          "difficulty_rank": 6,
+          "difficulty_hours": 55,
+          "reference_range_hours": [
+            35,
+            80
+          ],
+          "source_note": "baseline_from_reference"
+        },
+        {
+          "skill": "C#",
+          "difficulty_rank": 7,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": ".NET",
+          "difficulty_rank": 8,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Restful Api",
+          "difficulty_rank": 9,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "MongoDB",
+          "difficulty_rank": 10,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "C++",
+          "difficulty_rank": 11,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "C/C++",
+          "difficulty_rank": 12,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Go",
+          "difficulty_rank": 13,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "AI",
+          "difficulty_rank": 14,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Project Manager",
+          "difficulty_rank": 15,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "BrSE",
+          "difficulty_rank": 16,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Swift",
+          "difficulty_rank": 17,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "REST API",
+          "difficulty_rank": 18,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "WPF",
+          "difficulty_rank": 19,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Agile & Scrum",
+          "difficulty_rank": 20,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "MS SQL",
+          "difficulty_rank": 21,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "React/Typescript",
+          "difficulty_rank": 22,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "IT Support",
+          "difficulty_rank": 23,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Network",
+          "difficulty_rank": 24,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "IT Service",
+          "difficulty_rank": 25,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Linux",
+          "difficulty_rank": 26,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Security Engineer",
+          "difficulty_rank": 27,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "TypeScript",
+          "difficulty_rank": 28,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Business Analyst",
+          "difficulty_rank": 29,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Tensorflow",
+          "difficulty_rank": 30,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Database",
+          "difficulty_rank": 31,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "English",
+          "difficulty_rank": 32,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "PyTorch",
+          "difficulty_rank": 33,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "API",
+          "difficulty_rank": 34,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Data Engineer",
+          "difficulty_rank": 35,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "QA",
+          "difficulty_rank": 36,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "QA/QC",
+          "difficulty_rank": 37,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "HTML5",
+          "difficulty_rank": 38,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Tester",
+          "difficulty_rank": 39,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Automation Tester",
+          "difficulty_rank": 40,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Mobile",
+          "difficulty_rank": 41,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "React Native",
+          "difficulty_rank": 42,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "HTML",
+          "difficulty_rank": 43,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Spring Boot",
+          "difficulty_rank": 44,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Korean",
+          "difficulty_rank": 45,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Business/Sales",
+          "difficulty_rank": 46,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "UI/UX",
+          "difficulty_rank": 47,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Blockchain",
+          "difficulty_rank": 48,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Microservices",
+          "difficulty_rank": 49,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Java Spring Boot",
+          "difficulty_rank": 50,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": ".NET Core",
+          "difficulty_rank": 51,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "JSON",
+          "difficulty_rank": 52,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "PHP",
+          "difficulty_rank": 53,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Kotlin",
+          "difficulty_rank": 54,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Selenium",
+          "difficulty_rank": 55,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Vue.js",
+          "difficulty_rank": 56,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "System",
+          "difficulty_rank": 57,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "DNS",
+          "difficulty_rank": 58,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "SOC",
+          "difficulty_rank": 59,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "IT Security",
+          "difficulty_rank": 60,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "System Security",
+          "difficulty_rank": 61,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "Unix",
+          "difficulty_rank": 62,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "System Engineer",
+          "difficulty_rank": 63,
+          "difficulty_hours": 48,
+          "reference_range_hours": [
+            28,
+            68
+          ],
+          "source_note": "fallback_baseline_no_reference_match"
+        },
+        {
+          "skill": "PostgreSQL",
+          "difficulty_rank": 64,
+          "difficulty_hours": 45,
+          "reference_range_hours": [
+            30,
+            70
+          ],
+          "source_note": "baseline_from_reference"
+        },
+        {
+          "skill": "SQL",
+          "difficulty_rank": 65,
+          "difficulty_hours": 45,
+          "reference_range_hours": [
+            30,
+            70
+          ],
+          "source_note": "baseline_from_reference"
+        },
+        {
+          "skill": "Docker",
+          "difficulty_rank": 66,
+          "difficulty_hours": 30,
+          "reference_range_hours": [
+            18,
+            45
+          ],
+          "source_note": "baseline_from_reference"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "skill_a": ".NET",
+      "skill_b": ".NET Core",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 1.0,
+      "text_score": 1.0,
+      "edge_score": 1.0
+    },
+    {
+      "skill_a": "C++",
+      "skill_b": "C/C++",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 0.667,
+      "co_score": 0.667,
+      "alias_score": 1.0,
+      "text_score": 1.0,
+      "edge_score": 0.783
+    },
+    {
+      "skill_a": "HTML5",
+      "skill_b": "HTML",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 0.667,
+      "co_score": 0.667,
+      "alias_score": 1.0,
+      "text_score": 1.0,
+      "edge_score": 0.783
+    },
+    {
+      "skill_a": "IT Security",
+      "skill_b": "Security Engineer",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.5,
+      "edge_score": 0.7
+    },
+    {
+      "skill_a": "System Security",
+      "skill_b": "Security Engineer",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.5,
+      "edge_score": 0.7
+    },
+    {
+      "skill_a": "React",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.5,
+      "edge_score": 0.7
+    },
+    {
+      "skill_a": "Tester",
+      "skill_b": "Automation Tester",
+      "co_occurrence": 5,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.5,
+      "edge_score": 0.7
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Java Spring Boot",
+      "co_occurrence": 6,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.333,
+      "edge_score": 0.683
+    },
+    {
+      "skill_a": "IT Support",
+      "skill_b": "IT Service",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.333,
+      "edge_score": 0.683
+    },
+    {
+      "skill_a": "Vue.js",
+      "skill_b": "JavaScript",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Vue.js",
+      "skill_b": "React",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "System",
+      "skill_b": "DNS",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "System",
+      "skill_b": "SOC",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "System",
+      "skill_b": "AI",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "System",
+      "skill_b": "IT Support",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "System",
+      "skill_b": "Network",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "DNS",
+      "skill_b": "SOC",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "DNS",
+      "skill_b": "AI",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "DNS",
+      "skill_b": "IT Support",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "DNS",
+      "skill_b": "Network",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "SOC",
+      "skill_b": "AI",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Unix",
+      "skill_b": "Linux",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "MongoDB",
+      "skill_b": "PostgreSQL",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "English",
+      "skill_b": "Python",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "C++",
+      "co_occurrence": 6,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "Project Manager",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "BrSE",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "WPF",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "Agile & Scrum",
+      "co_occurrence": 5,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "MS SQL",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "React/Typescript",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": ".NET Core",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "JSON",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C++",
+      "skill_b": "Project Manager",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C++",
+      "skill_b": "WPF",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C++",
+      "skill_b": "JSON",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Node.js",
+      "skill_b": "HTML5",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Node.js",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Node.js",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Node.js",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Node.js",
+      "skill_b": "Business/Sales",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Restful Api",
+      "skill_b": "IT Service",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Restful Api",
+      "skill_b": "Microservices",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C/C++",
+      "skill_b": "Python",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C/C++",
+      "skill_b": "Docker",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C/C++",
+      "skill_b": "Tensorflow",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C/C++",
+      "skill_b": "Database",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C/C++",
+      "skill_b": "PyTorch",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C/C++",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Go",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Project Manager",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "REST API",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Tensorflow",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Database",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "PyTorch",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Data Engineer",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "HTML5",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Business/Sales",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "UI/UX",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Docker",
+      "skill_b": "Project Manager",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Docker",
+      "skill_b": "Tensorflow",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Docker",
+      "skill_b": "Database",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Docker",
+      "skill_b": "PyTorch",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Docker",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "AI",
+      "skill_b": "Machine Learning",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "AI",
+      "skill_b": "Tensorflow",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "AI",
+      "skill_b": "Database",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "AI",
+      "skill_b": "PyTorch",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "AI",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Swift",
+      "skill_b": "Java",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "SQL",
+      "skill_b": "IT Service",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "SQL",
+      "skill_b": "Tensorflow",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "SQL",
+      "skill_b": "Database",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "SQL",
+      "skill_b": "PyTorch",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "SQL",
+      "skill_b": "Data Engineer",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "SQL",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "SQL",
+      "skill_b": "UI/UX",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Agile & Scrum",
+      "co_occurrence": 5,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "MS SQL",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "React/Typescript",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Data Engineer",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "HTML5",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Spring Boot",
+      "co_occurrence": 5,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Business/Sales",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "UI/UX",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Microservices",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": ".NET Core",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "JSON",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Kotlin",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "JavaScript",
+      "skill_b": "HTML5",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "JavaScript",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "JavaScript",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "JavaScript",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "JavaScript",
+      "skill_b": "Business/Sales",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "REST API",
+      "skill_b": "React",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "React",
+      "skill_b": "HTML5",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "React",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "React",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "React",
+      "skill_b": "Business/Sales",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Agile & Scrum",
+      "skill_b": "MS SQL",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Agile & Scrum",
+      "skill_b": "React/Typescript",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Agile & Scrum",
+      "skill_b": ".NET",
+      "co_occurrence": 5,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Agile & Scrum",
+      "skill_b": ".NET Core",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Agile & Scrum",
+      "skill_b": "JSON",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "MS SQL",
+      "skill_b": "React/Typescript",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "MS SQL",
+      "skill_b": "Linux",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "MS SQL",
+      "skill_b": ".NET",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "MS SQL",
+      "skill_b": "Java Spring Boot",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "MS SQL",
+      "skill_b": ".NET Core",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "React/Typescript",
+      "skill_b": "Linux",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "React/Typescript",
+      "skill_b": ".NET",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "React/Typescript",
+      "skill_b": "Java Spring Boot",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "React/Typescript",
+      "skill_b": ".NET Core",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "IT Support",
+      "skill_b": "Network",
+      "co_occurrence": 5,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Network",
+      "skill_b": "IT Service",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "IT Service",
+      "skill_b": "Business Analyst",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "IT Service",
+      "skill_b": "QA/QC",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Linux",
+      "skill_b": "System Engineer",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Linux",
+      "skill_b": ".NET Core",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Linux",
+      "skill_b": "JSON",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "TypeScript",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "TypeScript",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Business Analyst",
+      "skill_b": "Tensorflow",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Business Analyst",
+      "skill_b": "Database",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Business Analyst",
+      "skill_b": "PyTorch",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Business Analyst",
+      "skill_b": "Data Engineer",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Business Analyst",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Business Analyst",
+      "skill_b": "UI/UX",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Tensorflow",
+      "skill_b": "Database",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Tensorflow",
+      "skill_b": "PyTorch",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Tensorflow",
+      "skill_b": "API",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Tensorflow",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Database",
+      "skill_b": "PyTorch",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Database",
+      "skill_b": "API",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Database",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "PyTorch",
+      "skill_b": "API",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "PyTorch",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "API",
+      "skill_b": "QA",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": ".NET",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": ".NET",
+      "skill_b": "JSON",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "QA/QC",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "QA/QC",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "HTML5",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "HTML5",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "HTML5",
+      "skill_b": "Spring Boot",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "HTML5",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "HTML5",
+      "skill_b": "Business/Sales",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Tester",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Tester",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Tester",
+      "skill_b": "UI/UX",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Tester",
+      "skill_b": "Selenium",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Automation Tester",
+      "skill_b": "Mobile",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Automation Tester",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Automation Tester",
+      "skill_b": "Selenium",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Mobile",
+      "skill_b": "React Native",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Mobile",
+      "skill_b": "Spring Boot",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "React Native",
+      "skill_b": "Spring Boot",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "HTML",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Spring Boot",
+      "skill_b": "Korean",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Spring Boot",
+      "skill_b": "Business/Sales",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "UI/UX",
+      "skill_b": "Blockchain",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java Spring Boot",
+      "skill_b": ".NET Core",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "Java Spring Boot",
+      "skill_b": "JSON",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": ".NET Core",
+      "skill_b": "JSON",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "JSON",
+      "skill_b": "PHP",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 1.0,
+      "co_score": 1.0,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.65
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": ".NET",
+      "co_occurrence": 9,
+      "conditional_co_occurrence": 0.9,
+      "co_score": 0.9,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.585
+    },
+    {
+      "skill_a": "SQL",
+      "skill_b": "Business Analyst",
+      "co_occurrence": 5,
+      "conditional_co_occurrence": 0.833,
+      "co_score": 0.833,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.542
+    },
+    {
+      "skill_a": "Restful Api",
+      "skill_b": "QA/QC",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "API",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "QA/QC",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Automation Tester",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Spring Boot",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "AI",
+      "skill_b": "API",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "QA/QC",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Automation Tester",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "JavaScript",
+      "skill_b": "HTML",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "JavaScript",
+      "skill_b": "Spring Boot",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "Business Analyst",
+      "skill_b": "QA/QC",
+      "co_occurrence": 4,
+      "conditional_co_occurrence": 0.8,
+      "co_score": 0.8,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.52
+    },
+    {
+      "skill_a": "MongoDB",
+      "skill_b": "Docker",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "English",
+      "skill_b": "JavaScript",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "English",
+      "skill_b": "Business Analyst",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "C#",
+      "skill_b": "PHP",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Node.js",
+      "skill_b": "Java",
+      "co_occurrence": 6,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Node.js",
+      "skill_b": "JavaScript",
+      "co_occurrence": 6,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Node.js",
+      "skill_b": "TypeScript",
+      "co_occurrence": 6,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Python",
+      "skill_b": "Tester",
+      "co_occurrence": 6,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "TypeScript",
+      "co_occurrence": 6,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Tester",
+      "co_occurrence": 6,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "PHP",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Agile & Scrum",
+      "skill_b": "PHP",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Network",
+      "skill_b": "Security Engineer",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": ".NET",
+      "skill_b": "PHP",
+      "co_occurrence": 3,
+      "conditional_co_occurrence": 0.75,
+      "co_score": 0.75,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.488
+    },
+    {
+      "skill_a": "Spring Boot",
+      "skill_b": "Java Spring Boot",
+      "co_occurrence": 2,
+      "conditional_co_occurrence": 0.4,
+      "co_score": 0.4,
+      "alias_score": 0.6,
+      "text_score": 0.667,
+      "edge_score": 0.477
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "Blockchain",
+      "co_occurrence": 5,
+      "conditional_co_occurrence": 0.714,
+      "co_score": 0.714,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.464
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": "JavaScript",
+      "co_occurrence": 7,
+      "conditional_co_occurrence": 0.7,
+      "co_score": 0.7,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.455
+    },
+    {
+      "skill_a": "Java",
+      "skill_b": ".NET",
+      "co_occurrence": 7,
+      "conditional_co_occurrence": 0.7,
+      "co_score": 0.7,
+      "alias_score": 0.0,
+      "text_score": 0.0,
+      "edge_score": 0.455
+    }
+  ]
+}

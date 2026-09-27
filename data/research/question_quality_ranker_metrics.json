@@ -1,0 +1,18 @@
+{
+  "model": "TF-IDF + Ridge pointwise question quality ranker",
+  "label_source": "multi_llm_consensus_pseudo_labels",
+  "dataset_rows": 300,
+  "context_groups": 102,
+  "train_rows": 240,
+  "test_rows": 60,
+  "split_strategy": "group_by_benchmark_case",
+  "pseudo_label_metrics": {
+    "mae": 0.216021,
+    "rmse": 0.299892,
+    "spearman": 0.460947
+  },
+  "ndcg": 0.988512,
+  "top_1_accuracy": 0.384615,
+  "human_audit_test_rows": 0,
+  "human_audit_metrics": null
+}
