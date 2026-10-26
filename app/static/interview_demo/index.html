@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bản thử nghiệm phỏng vấn AI bằng chat với CV và Job lưu trên Supabase.">
+  <title>Prep/Hire AI Interview Lab</title>
+  <link rel="stylesheet" href="/demo-assets/styles.css">
+  <script src="/demo-assets/app.js" defer></script>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="topbar">
+    <a class="brand" href="/demo" aria-label="Prep Hire Lab">
+      <span class="brand-mark">P/H</span>
+      <span>
+        <strong>Interview Lab</strong>
+        <small>adaptive hiring intelligence</small>
+      </span>
+    </a>
+    <div class="model-health" id="modelHealth">
+      <span class="pulse"></span>
+      <span>Đang kiểm tra mô hình</span>
+    </div>
+  </header>
+
+  <main class="shell">
+    <aside class="control-panel" aria-labelledby="setupTitle">
+      <div class="eyebrow">Thiết lập phiên</div>
+      <h1 id="setupTitle">Chọn hồ sơ.<br>Vào ghế nóng.</h1>
+      <p class="intro">Dùng dữ liệu mẫu đã lưu. Bốn AI đề xuất, Ranker V2 chọn đúng một câu để hỏi.</p>
+
+      <form id="setupForm" class="setup-form">
+        <label for="cvSelect">
+          <span>01 / CV ứng viên</span>
+          <select id="cvSelect" required disabled>
+            <option value="">Đang tải CV...</option>
+          </select>
+        </label>
+
+        <label for="jobSelect">
+          <span>02 / Vị trí tuyển dụng</span>
+          <select id="jobSelect" required disabled>
+            <option value="">Đang tải Job...</option>
+          </select>
+        </label>
+
+        <div class="field-row">
+          <label for="questionCount">
+            <span>03 / Số câu</span>
+            <select id="questionCount">
+              <option value="5">5 câu</option>
+              <option value="8" selected>8 câu</option>
+              <option value="10">10 câu</option>
+            </select>
+          </label>
+          <label for="languageSelect">
+            <span>04 / Ngôn ngữ</span>
+            <select id="languageSelect">
+              <option value="vi" selected>Tiếng Việt</option>
+              <option value="en">English</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="switch-row" for="externalAi">
+          <span>
+            <strong>Hội đồng nhiều AI</strong>
+            <small>Tạo 4 câu và dùng Ranker V2</small>
+          </span>
+          <input id="externalAi" type="checkbox" checked>
+          <i aria-hidden="true"></i>
+        </label>
+
+        <button class="primary-button" id="startButton" type="submit" disabled>
+          <span>Bắt đầu phỏng vấn</span>
+          <b aria-hidden="true">↗</b>
+        </button>
+      </form>
+
+      <div class="privacy-note">
+        <strong>Chế độ thử nghiệm nội bộ</strong>
+        <p>Email, số điện thoại và URL trong CV được che trước khi gửi tới nhà cung cấp AI.</p>
+      </div>
+    </aside>
+
+    <section class="interview-stage" aria-label="Phỏng vấn bằng chat">
+      <div class="stage-header">
+        <div>
+          <div class="eyebrow">Phiên phỏng vấn</div>
+          <h2 id="sessionTitle">Chưa bắt đầu</h2>
+        </div>
+        <div class="progress-wrap" aria-label="Tiến độ phỏng vấn">
+          <span id="progressLabel">0 / 0</span>
+          <div class="progress-track"><i id="progressBar"></i></div>
+        </div>
+      </div>
+
+      <div id="notice" class="notice" role="status" hidden></div>
+
+      <div class="conversation" id="conversation" aria-live="polite">
+        <div class="empty-state" id="emptyState">
+          <div class="orbit" aria-hidden="true"><span>AI</span></div>
+          <div>
+            <p class="eyebrow">Sẵn sàng khi bạn sẵn sàng</p>
+            <h3>Một cuộc phỏng vấn có cấu trúc, không phải chatbot ngẫu nhiên.</h3>
+            <p>Chọn CV và Job. Hệ thống sẽ đọc context, tạo các câu hỏi cạnh tranh và chỉ đưa câu tốt nhất vào cuộc trò chuyện.</p>
+          </div>
+        </div>
+      </div>
+
+      <form id="answerForm" class="composer" hidden>
+        <textarea id="answerInput" rows="3" maxlength="10000" placeholder="Nhập câu trả lời của bạn..." required></textarea>
+        <div class="composer-footer">
+          <span>Enter để gửi · Shift + Enter để xuống dòng</span>
+          <button type="submit" id="sendButton">
+            <span>Gửi trả lời</span>
+            <b aria-hidden="true">→</b>
+          </button>
+        </div>
+      </form>
+
+      <section class="summary-panel" id="summaryPanel" hidden>
+        <div class="summary-heading">
+          <div>
+            <p class="eyebrow">Tổng hợp bằng chứng</p>
+            <h3>Ảnh chụp năng lực cuối phiên</h3>
+          </div>
+          <div class="overall-score" id="overallScore">—</div>
+        </div>
+        <div class="competency-grid" id="competencyGrid"></div>
+        <p class="summary-disclaimer">Điểm là tín hiệu bằng chứng của mô hình V1, không phải quyết định tuyển dụng.</p>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

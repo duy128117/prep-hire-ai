@@ -52,6 +52,7 @@ class SyntheticAnswerSample(Base):
     provider = Column(String(50), nullable=False, default="google")
     generator_model_name = Column(String(100), nullable=False, index=True)
     target_quality_level = Column(Integer, nullable=False)
+    generation_metadata_json = Column(JSON, nullable=True)
     status = Column(String(20), nullable=False)
     answer_text = Column(Text, nullable=True)
     prompt_version = Column(String(30), nullable=False)

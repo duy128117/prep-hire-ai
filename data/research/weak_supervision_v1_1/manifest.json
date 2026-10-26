@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "dataset_version": "weak-supervision-v1.1",
+  "created_at": "2026-10-01T06:21:08.538947+00:00",
+  "random_state": 42,
+  "split_strategy": "deterministic_group_by_benchmark_case_stratified_by_stage_and_criterion",
+  "ratios": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "sources": {
+    "question": {
+      "path": "data\\research\\weak_supervision_v1_1\\all\\question_ranking_all.csv",
+      "rows": 1000,
+      "sha256": "2ed511926d77b3544367d0073267149af5bcc74b94f93614226ba09ea726dc1c"
+    },
+    "answer": {
+      "path": "data\\research\\weak_supervision_v1_1\\all\\turn_evidence_all.csv",
+      "rows": 1000,
+      "sha256": "e14b7a76a06428d55d2e0a9fcbcf6dbee00124f5862d21d22f00bedc604ebd8d"
+    }
+  },
+  "context_groups": {
+    "train": 168,
+    "validation": 35,
+    "test": 37
+  },
+  "group_overlap": {
+    "train_validation": 0,
+    "train_test": 0,
+    "validation_test": 0
+  },
+  "files": {
+    "question_train": {
+      "path": "data\\research\\weak_supervision_v1_1\\splits\\question_train.csv",
+      "rows": 700,
+      "groups": 168,
+      "sha256": "313cb6851f153e3e5ccf459603b9f173b11024a0f2b2a4a9bc82e183781054de"
+    },
+    "question_validation": {
+      "path": "data\\research\\weak_supervision_v1_1\\splits\\question_validation.csv",
+      "rows": 144,
+      "groups": 35,
+      "sha256": "7b1d5814b25047ef0e516a6a97482e929d079c4314e034e6953b51322a0bec42"
+    },
+    "question_test": {
+      "path": "data\\research\\weak_supervision_v1_1\\splits\\question_test.csv",
+      "rows": 156,
+      "groups": 37,
+      "sha256": "7b269baa53f4fdbe3e661617049aaae0f793fcafea8c0287996d318441e29c64"
+    },
+    "answer_train": {
+      "path": "data\\research\\weak_supervision_v1_1\\splits\\answer_train.csv",
+      "rows": 700,
+      "groups": 168,
+      "sha256": "1840289359c34b6747ca7df396535cfeddecc769025aee81eeb0b9b2ce80ed72"
+    },
+    "answer_validation": {
+      "path": "data\\research\\weak_supervision_v1_1\\splits\\answer_validation.csv",
+      "rows": 144,
+      "groups": 35,
+      "sha256": "bce904332577c9b13d8bada112b67a6cde214a7e3ed3840ed6c708045b9c969e"
+    },
+    "answer_test": {
+      "path": "data\\research\\weak_supervision_v1_1\\splits\\answer_test.csv",
+      "rows": 156,
+      "groups": 37,
+      "sha256": "8be8a48b71cecc8d6ffd08b17727e42cc61c0a40add32884fb0e2cf04427c0b2"
+    }
+  }
+}

@@ -11,10 +11,15 @@ from sqlalchemy.orm import sessionmaker
 from app.db.base_class import Base
 from app.models.interview_session import InterviewSession
 from app.models.interview_turn import InterviewTurn
+from app.models.interview_evidence_summary import InterviewEvidenceSummary
 from app.services.interview_service import AdaptiveQuestionEngine, InterviewSessionService
+from app.services.interview_service import GeneratedQuestion
+from app.services.llm_provider_service import LLMProviderSpec
+from app.services.interview_model_service import InterviewModelService
 from app.services.llm_provider_service import (
     LLMJsonResult,
     LLMProviderError,
+    LLMProviderService,
     TokenUsage,
 )
 from app.services.ai_service import AIService
@@ -42,6 +47,56 @@ JOB_PROFILE = {
 
 
 class AdaptiveQuestionEngineTests(unittest.TestCase):
+    def test_multi_provider_questions_are_ranked(self) -> None:
+        specs = tuple(
+            LLMProviderSpec(f"provider-{index}", f"model-{index}")
+            for index in range(4)
+        )
+
+        def generated_for_provider(*args, **kwargs):
+            provider = kwargs["provider"]
+            index = int(provider.rsplit("-", 1)[1])
+            return GeneratedQuestion(
+                stage="technical",
+                criterion="technical_knowledge",
+                question=f"Candidate question {index}",
+                expected_signal="Technical evidence",
+                source="ai",
+                model_name=f"model-{index}",
+                prompt_hash=f"hash-{index}",
+                latency_ms=10,
+                provider=provider,
+                applicable_answer_criteria=("answer_relevance",),
+            )
+
+        with (
+            patch.object(LLMProviderService, "pool_specs", return_value=specs),
+            patch.object(LLMProviderService, "is_configured", return_value=True),
+            patch.object(AdaptiveQuestionEngine, "generate", side_effect=generated_for_provider),
+            patch.object(
+                InterviewModelService,
+                "rank_questions",
+                return_value=([0.1, 0.9, 0.3, 0.2], "pairwise_question_quality_ranker_v2"),
+            ),
+        ):
+            selection = AdaptiveQuestionEngine.generate_ranked(
+                1,
+                5,
+                "en",
+                "Synthetic CV with Python project evidence.",
+                "Synthetic JD requiring Python and API design.",
+                CV_PROFILE,
+                JOB_PROFILE,
+                [],
+            )
+
+        self.assertEqual(selection.selected.question, "Candidate question 2")
+        self.assertEqual(selection.selected_score, 0.9)
+        self.assertEqual(
+            len([item for item in selection.candidates if item.get("question")]),
+            4,
+        )
+
     @patch("app.services.interview_service.settings.CV_AI_ENRICHMENT_ENABLED", True)
     @patch("app.services.interview_service.LLMProviderService.generate_json")
     def test_question_generation_retries_invalid_json(self, generate_json) -> None:
@@ -87,6 +142,83 @@ class AdaptiveQuestionEngineTests(unittest.TestCase):
             generate_json.call_args.args[1],
         )
 
+    @patch("app.services.interview_service.settings.CV_AI_ENRICHMENT_ENABLED", True)
+    @patch("app.services.interview_service.LLMProviderService.generate_json")
+    def test_question_generation_retries_missing_question(self, generate_json) -> None:
+        invalid_content = LLMJsonResult(
+            "inception",
+            "mercury-2.5",
+            {"criterion": "technical_knowledge"},
+            TokenUsage(10, 5, 15),
+            8,
+        )
+        valid_content = LLMJsonResult(
+            "inception",
+            "mercury-2.5",
+            {
+                "question": "How did you validate your API design?",
+                "criterion": "technical_knowledge",
+                "expected_signal": "A concrete validation approach.",
+            },
+            TokenUsage(10, 5, 15),
+            8,
+        )
+        generate_json.side_effect = [invalid_content, valid_content]
+
+        generated = AdaptiveQuestionEngine.generate(
+            turn_index=1,
+            max_questions=5,
+            language="en",
+            cv_text="Python backend developer with API project experience.",
+            jd_text="Backend role requiring Python, FastAPI, SQL, and testing.",
+            cv_profile=CV_PROFILE,
+            job_profile=JOB_PROFILE,
+            history=[],
+            allow_external_ai=True,
+            model_name="mercury-2.5",
+            provider="inception",
+            strict_external_ai=True,
+        )
+
+        self.assertEqual(generated.source, "ai")
+        self.assertEqual(generate_json.call_count, 2)
+        self.assertIn(
+            "missing, empty, or oversized question field",
+            generate_json.call_args.args[1],
+        )
+
+    @patch("app.services.interview_service.settings.CV_AI_ENRICHMENT_ENABLED", True)
+    @patch("app.services.interview_service.LLMProviderService.generate_json")
+    def test_strict_generation_rejects_repeated_missing_question(
+        self,
+        generate_json,
+    ) -> None:
+        generate_json.return_value = LLMJsonResult(
+            "inception",
+            "mercury-2.5",
+            {"criterion": "technical_knowledge"},
+            TokenUsage(10, 5, 15),
+            8,
+        )
+
+        with self.assertRaises(LLMProviderError) as raised:
+            AdaptiveQuestionEngine.generate(
+                turn_index=1,
+                max_questions=5,
+                language="en",
+                cv_text="Python backend developer.",
+                jd_text="Backend role requiring API design.",
+                cv_profile=CV_PROFILE,
+                job_profile=JOB_PROFILE,
+                history=[],
+                allow_external_ai=True,
+                provider="inception",
+                strict_external_ai=True,
+            )
+
+        self.assertEqual(raised.exception.error_code, "invalid_content")
+        self.assertEqual(generate_json.call_count, 3)
+
     def test_redacts_contact_data_before_external_prompt(self) -> None:
         prompt = AdaptiveQuestionEngine.build_prompt(
             stage="technical",
@@ -103,6 +235,52 @@ class AdaptiveQuestionEngineTests(unittest.TestCase):
         self.assertNotIn("912 345 678", prompt)
         self.assertNotIn("portfolio.example", prompt)
         self.assertIn("[REDACTED_EMAIL]", prompt)
+
+    @patch("app.services.interview_service.settings.CV_AI_ENRICHMENT_ENABLED", True)
+    @patch("app.services.interview_service.LLMProviderService.generate_json")
+    def test_dataset_controls_lock_difficulty_and_required_applicability(
+        self,
+        generate_json,
+    ) -> None:
+        generate_json.return_value = LLMJsonResult(
+            "groq",
+            "openai/gpt-oss-120b",
+            {
+                "question": "How would you diagnose a slow API?",
+                "criterion": "problem_solving",
+                "expected_signal": "A structured diagnostic process.",
+                "question_type": "problem_solving",
+                "difficulty": 5,
+                "required_signals": ["measure", "isolate"],
+                "bonus_signals": ["distributed tracing"],
+                "applicable_answer_criteria": ["reasoning_quality"],
+                "contradiction_rules": [],
+            },
+            TokenUsage(10, 5, 15),
+            8,
+        )
+
+        generated = AdaptiveQuestionEngine.generate(
+            turn_index=3,
+            max_questions=7,
+            language="en",
+            cv_text="Python backend developer.",
+            jd_text="Backend role requiring production diagnostics.",
+            cv_profile=CV_PROFILE,
+            job_profile=JOB_PROFILE,
+            history=[],
+            allow_external_ai=True,
+            provider="groq",
+            strict_external_ai=True,
+            generation_controls={"difficulty": 2},
+        )
+
+        self.assertEqual(generated.difficulty, 2)
+        self.assertIn("reasoning_quality", generated.applicable_answer_criteria)
+        self.assertIn("answer_relevance", generated.applicable_answer_criteria)
+        self.assertIn("expected_signal_coverage", generated.applicable_answer_criteria)
+        self.assertIn("clarity_conciseness", generated.applicable_answer_criteria)
+        self.assertIn("consistency", generated.applicable_answer_criteria)
 
     def test_short_answer_triggers_follow_up(self) -> None:
         history = [
@@ -151,6 +329,27 @@ class AdaptiveQuestionEngineTests(unittest.TestCase):
             question_source="fallback",
             model_name=None,
             generation_latency_ms=0,
+            question_candidates_json=[
+                {
+                    "provider": "groq",
+                    "model_name": "model-a",
+                    "question": "Please introduce yourself.",
+                    "criterion": "role_relevance",
+                    "question_type": "behavioral",
+                    "difficulty": 2,
+                    "pairwise_utility": 0.42,
+                    "selected": True,
+                    "generation_latency_ms": 120,
+                },
+                {
+                    "provider": "cohere",
+                    "model_name": "model-b",
+                    "question": "What project best represents your experience?",
+                    "pairwise_utility": 0.18,
+                    "selected": False,
+                    "generation_latency_ms": 150,
+                },
+            ],
             created_at=now,
             answered_at=None,
         )
@@ -173,6 +372,13 @@ class AdaptiveQuestionEngineTests(unittest.TestCase):
         self.assertEqual(response.session_id, "response-test")
         self.assertIsNotNone(response.current_question)
         self.assertEqual(response.current_question.turn_index, 0)
+        self.assertEqual(len(response.turns[0].question_candidates), 2)
+        self.assertEqual(
+            response.turns[0].question_candidates[0].provider_name,
+            "groq",
+        )
+        self.assertTrue(response.turns[0].question_candidates[0].selected)
+        self.assertEqual(response.turns[0].question_candidates[0].difficulty, 2)
 
 
 class InterviewSessionServiceTests(unittest.TestCase):
@@ -180,7 +386,11 @@ class InterviewSessionServiceTests(unittest.TestCase):
         self.engine = create_engine("sqlite+pysqlite:///:memory:")
         Base.metadata.create_all(
             self.engine,
-            tables=[InterviewSession.__table__, InterviewTurn.__table__],
+            tables=[
+                InterviewSession.__table__,
+                InterviewTurn.__table__,
+                InterviewEvidenceSummary.__table__,
+            ],
         )
         self.db = sessionmaker(bind=self.engine)()
 
@@ -223,6 +433,13 @@ class InterviewSessionServiceTests(unittest.TestCase):
         self.assertEqual(completed.status, "completed")
         self.assertEqual(completed.current_stage, "completed")
         self.assertIsNotNone(completed.completed_at)
+        summary = (
+            self.db.query(InterviewEvidenceSummary)
+            .filter(InterviewEvidenceSummary.session_id == completed.session_id)
+            .one()
+        )
+        self.assertEqual(summary.status, "final")
+        self.assertIn("overall_readiness", summary.competency_scores_json)
 
 
 if __name__ == "__main__":

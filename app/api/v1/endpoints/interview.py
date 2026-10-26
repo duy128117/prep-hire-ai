@@ -1,8 +1,10 @@
+import time
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.db.session import get_db
+from app.db.session import engine, get_db
 from app.schemas.interview import (
     ContextExtractionMetadata,
     CandidateEvaluationRequest,
@@ -14,15 +16,27 @@ from app.schemas.interview import (
     InterviewAnswerRequest,
     InterviewContextRequest,
     InterviewContextResponse,
+    InterviewQuestionCandidateResponse,
     InterviewQuestionResponse,
     InterviewSessionCreateRequest,
     InterviewSessionResponse,
     InterviewTurnResponse,
+    InterviewEvidenceSummaryResponse,
+    RealtimeInterviewModelStatusResponse,
+    SyntheticInterviewSessionCreateRequest,
+    StoredInterviewOptionsResponse,
+    StoredInterviewSessionCreateRequest,
 )
 from app.research.rubrics import CANDIDATE_EVALUATION_RUBRIC, QUESTION_QUALITY_RUBRIC
 from app.services.pdf_processor import CvIngestService
 from app.services.interview_service import InterviewSessionService
 from app.services.interview_service import AdaptiveQuestionEngine
+from app.services.interview_model_service import InterviewModelService
+from app.services.synthetic_interview_context_service import SyntheticInterviewContextService
+from app.services.interview_evidence_aggregation_service import (
+    InterviewEvidenceSummaryService,
+)
+from app.services.stored_interview_demo_service import StoredInterviewDemoService
 from app.services.evaluation_service import CandidateEvaluationService, ExpertConsensusService
 
 
@@ -37,8 +51,45 @@ def _session_response(session) -> InterviewSessionResponse:
             question=turn.question_text,
             answer=turn.answer_text,
             question_source=turn.question_source,
+            provider_name=getattr(turn, "provider_name", None),
             model_name=turn.model_name,
             generation_latency_ms=turn.generation_latency_ms,
+            question_candidate_count=len(
+                [
+                    item
+                    for item in (getattr(turn, "question_candidates_json", None) or [])
+                    if item.get("question")
+                ]
+            ) or 1,
+            question_candidates=[
+                InterviewQuestionCandidateResponse(
+                    provider_name=item.get("provider"),
+                    model_name=item.get("model_name"),
+                    question=str(item.get("question") or ""),
+                    criterion=item.get("criterion"),
+                    question_type=item.get("question_type"),
+                    difficulty=item.get("difficulty"),
+                    pairwise_utility=item.get("pairwise_utility"),
+                    selected=bool(item.get("selected", False)),
+                    generation_latency_ms=int(
+                        item.get("generation_latency_ms") or 0
+                    ),
+                )
+                for item in (
+                    getattr(turn, "question_candidates_json", None) or []
+                )
+                if item.get("question")
+            ],
+            selected_question_score=getattr(turn, "selected_question_score", None),
+            question_ranker_version=getattr(turn, "question_ranker_version", None),
+            question_selection_latency_ms=getattr(
+                turn, "question_selection_latency_ms", 0
+            ),
+            answer_evidence=getattr(turn, "answer_scores_json", None),
+            answer_scorer_version=getattr(turn, "answer_scorer_version", None),
+            answer_scoring_latency_ms=getattr(
+                turn, "answer_scoring_latency_ms", 0
+            ),
             created_at=turn.created_at,
             answered_at=turn.answered_at,
         )
@@ -63,6 +114,9 @@ def _session_response(session) -> InterviewSessionResponse:
         current_stage=session.current_stage,
         allow_external_ai=session.allow_external_ai,
         research_consent=session.research_consent,
+        context_source=getattr(session, "context_source", "user_supplied"),
+        source_cv_id=getattr(session, "source_cv_id", None),
+        source_job_id=getattr(session, "source_job_id", None),
         current_question=current_question,
         turns=turns,
         created_at=session.created_at,
@@ -85,6 +139,20 @@ def _evaluation_response(evaluation) -> CandidateEvaluationResponse:
     )
 
 
+def _evidence_summary_response(summary) -> InterviewEvidenceSummaryResponse:
+    return InterviewEvidenceSummaryResponse(
+        summary_id=summary.summary_id,
+        session_id=summary.session_id,
+        aggregator_version=summary.aggregator_version,
+        status=summary.status,
+        competencies=summary.competency_scores_json,
+        evidence=summary.evidence_json,
+        flags=summary.flags_json,
+        created_at=summary.created_at,
+        updated_at=summary.updated_at,
+    )
+
+
 def _annotation_response(annotation) -> ExpertAnnotationResponse:
     return ExpertAnnotationResponse(
         annotation_id=annotation.annotation_id,
@@ -104,6 +172,73 @@ def get_research_rubrics() -> dict:
         "question_quality": QUESTION_QUALITY_RUBRIC,
         "candidate_evaluation": CANDIDATE_EVALUATION_RUBRIC,
     }
+
+
+@router.get(
+    "/realtime-models/status",
+    response_model=RealtimeInterviewModelStatusResponse,
+)
+def get_realtime_model_status() -> RealtimeInterviewModelStatusResponse:
+    return RealtimeInterviewModelStatusResponse(**InterviewModelService.status())
+
+
+@router.get("/demo/options", response_model=StoredInterviewOptionsResponse)
+def get_stored_interview_options(
+    db: Session = Depends(get_db),
+) -> StoredInterviewOptionsResponse:
+    last_error: SQLAlchemyError | None = None
+    for attempt in range(3):
+        try:
+            return StoredInterviewOptionsResponse(
+                **StoredInterviewDemoService.list_options(db)
+            )
+        except OperationalError as exc:
+            last_error = exc
+            db.rollback()
+            engine.dispose()
+            if attempt < 2:
+                time.sleep(0.75 * (attempt + 1))
+        except SQLAlchemyError as exc:
+            db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to load stored interview options: {exc}",
+            ) from exc
+    raise HTTPException(
+        status_code=503,
+        detail="Supabase is temporarily unreachable. Please retry in a few seconds.",
+    ) from last_error
+
+
+@router.post(
+    "/demo/sessions",
+    response_model=InterviewSessionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_stored_interview_session(
+    payload: StoredInterviewSessionCreateRequest,
+    db: Session = Depends(get_db),
+) -> InterviewSessionResponse:
+    try:
+        session = StoredInterviewDemoService.create_session(
+            db,
+            cv_id=payload.cv_id,
+            job_id=payload.job_id,
+            language=payload.language,
+            max_questions=payload.max_questions,
+            allow_external_ai=payload.allow_external_ai,
+        )
+    except ValueError as exc:
+        db.rollback()
+        status_code = 404 if "not found" in str(exc).lower() else 400
+        raise HTTPException(status_code=status_code, detail=str(exc)) from exc
+    except SQLAlchemyError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to create stored interview session: {exc}",
+        ) from exc
+    return _session_response(session)
 
 
 @router.post(
@@ -135,6 +270,40 @@ def create_interview_session(
     return _session_response(session)
 
 
+@router.post(
+    "/synthetic-sessions",
+    response_model=InterviewSessionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_synthetic_interview_session(
+    payload: SyntheticInterviewSessionCreateRequest,
+    db: Session = Depends(get_db),
+) -> InterviewSessionResponse:
+    context = SyntheticInterviewContextService.generate(
+        payload.seed,
+        payload.role,
+        payload.level,
+    )
+    try:
+        session = InterviewSessionService.create(
+            db=db,
+            cv_text=context.cv_text,
+            jd_text=context.jd_text,
+            language=payload.language,
+            max_questions=payload.max_questions,
+            allow_external_ai=payload.allow_external_ai,
+            research_consent=False,
+            context_source="synthetic",
+        )
+    except (ValueError, SQLAlchemyError) as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to create synthetic interview session: {exc}",
+        ) from exc
+    return _session_response(session)
+
+
 @router.get("/sessions/{session_id}", response_model=InterviewSessionResponse)
 def get_interview_session(
     session_id: str,
@@ -162,6 +331,44 @@ def submit_interview_answer(
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to save interview answer: {exc}") from exc
     return _session_response(session)
+
+
+@router.post(
+    "/sessions/{session_id}/evidence-summary",
+    response_model=InterviewEvidenceSummaryResponse,
+)
+def create_interview_evidence_summary(
+    session_id: str,
+    db: Session = Depends(get_db),
+) -> InterviewEvidenceSummaryResponse:
+    session = InterviewSessionService.get(db, session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Interview session not found")
+    try:
+        summary = InterviewEvidenceSummaryService.create_or_update(db, session)
+    except SQLAlchemyError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to aggregate interview evidence: {exc}",
+        ) from exc
+    return _evidence_summary_response(summary)
+
+
+@router.get(
+    "/sessions/{session_id}/evidence-summary",
+    response_model=InterviewEvidenceSummaryResponse,
+)
+def get_interview_evidence_summary(
+    session_id: str,
+    db: Session = Depends(get_db),
+) -> InterviewEvidenceSummaryResponse:
+    if not InterviewSessionService.get(db, session_id):
+        raise HTTPException(status_code=404, detail="Interview session not found")
+    summary = InterviewEvidenceSummaryService.get(db, session_id)
+    if not summary:
+        raise HTTPException(status_code=404, detail="Interview evidence summary not found")
+    return _evidence_summary_response(summary)
 
 
 @router.post(

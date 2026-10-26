@@ -1,0 +1,147 @@
+{
+  "model": "TF-IDF + Ridge multi-output candidate answer scorer",
+  "label_source": "multi_llm_consensus_pseudo_labels",
+  "dataset_rows": 1000,
+  "context_groups": 240,
+  "train_rows": 701,
+  "validation_rows": 147,
+  "test_rows": 152,
+  "train_context_groups": 168,
+  "validation_context_groups": 35,
+  "test_context_groups": 37,
+  "split_strategy": "precomputed_group_by_benchmark_case_stratified_by_stage_and_criterion",
+  "validation_metrics": {
+    "rows": 147,
+    "context_groups": 35,
+    "overall_pseudo_label_metrics": {
+      "mae": 0.705462,
+      "rmse": 0.873634,
+      "spearman": 0.80483
+    },
+    "by_criterion": {
+      "answer_relevance": {
+        "mae": 0.718257,
+        "rmse": 0.911295,
+        "spearman": 0.806863
+      },
+      "technical_correctness": {
+        "mae": 0.75054,
+        "rmse": 0.901067,
+        "spearman": 0.825203
+      },
+      "reasoning_depth": {
+        "mae": 0.604337,
+        "rmse": 0.750512,
+        "spearman": 0.862166
+      },
+      "evidence_specificity": {
+        "mae": 0.776488,
+        "rmse": 0.928774,
+        "spearman": 0.863104
+      },
+      "clarity": {
+        "mae": 0.514051,
+        "rmse": 0.650534,
+        "spearman": 0.804493
+      },
+      "consistency": {
+        "mae": 0.866082,
+        "rmse": 1.057459,
+        "spearman": 0.590853
+      },
+      "criterion_score": {
+        "mae": 0.708478,
+        "rmse": 0.856138,
+        "spearman": 0.836841
+      }
+    }
+  },
+  "test_metrics": {
+    "rows": 152,
+    "context_groups": 37,
+    "overall_pseudo_label_metrics": {
+      "mae": 0.727102,
+      "rmse": 0.901325,
+      "spearman": 0.801857
+    },
+    "by_criterion": {
+      "answer_relevance": {
+        "mae": 0.811207,
+        "rmse": 1.012916,
+        "spearman": 0.793598
+      },
+      "technical_correctness": {
+        "mae": 0.750406,
+        "rmse": 0.937625,
+        "spearman": 0.790377
+      },
+      "reasoning_depth": {
+        "mae": 0.59666,
+        "rmse": 0.725825,
+        "spearman": 0.865705
+      },
+      "evidence_specificity": {
+        "mae": 0.784639,
+        "rmse": 0.914318,
+        "spearman": 0.830218
+      },
+      "clarity": {
+        "mae": 0.509671,
+        "rmse": 0.646426,
+        "spearman": 0.74474
+      },
+      "consistency": {
+        "mae": 0.948275,
+        "rmse": 1.127552,
+        "spearman": 0.552971
+      },
+      "criterion_score": {
+        "mae": 0.68886,
+        "rmse": 0.854125,
+        "spearman": 0.807719
+      }
+    }
+  },
+  "overall_pseudo_label_metrics": {
+    "mae": 0.727102,
+    "rmse": 0.901325,
+    "spearman": 0.801857
+  },
+  "by_criterion": {
+    "answer_relevance": {
+      "mae": 0.811207,
+      "rmse": 1.012916,
+      "spearman": 0.793598
+    },
+    "technical_correctness": {
+      "mae": 0.750406,
+      "rmse": 0.937625,
+      "spearman": 0.790377
+    },
+    "reasoning_depth": {
+      "mae": 0.59666,
+      "rmse": 0.725825,
+      "spearman": 0.865705
+    },
+    "evidence_specificity": {
+      "mae": 0.784639,
+      "rmse": 0.914318,
+      "spearman": 0.830218
+    },
+    "clarity": {
+      "mae": 0.509671,
+      "rmse": 0.646426,
+      "spearman": 0.74474
+    },
+    "consistency": {
+      "mae": 0.948275,
+      "rmse": 1.127552,
+      "spearman": 0.552971
+    },
+    "criterion_score": {
+      "mae": 0.68886,
+      "rmse": 0.854125,
+      "spearman": 0.807719
+    }
+  }
+}

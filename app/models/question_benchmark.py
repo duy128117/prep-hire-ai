@@ -81,6 +81,7 @@ class QuestionBenchmarkOutput(Base):
     question_text = Column(Text, nullable=True)
     criterion = Column(String(60), nullable=True)
     expected_signal = Column(Text, nullable=True)
+    generation_metadata_json = Column(JSON, nullable=True)
     latency_ms = Column(Integer, nullable=False, default=0)
     prompt_hash = Column(String(64), nullable=False)
     error_message = Column(Text, nullable=True)

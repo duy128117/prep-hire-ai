@@ -5,7 +5,7 @@ import json
 import statistics
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
@@ -19,7 +19,11 @@ from app.models.weak_supervision import (
     QuestionAIJudgment,
     SyntheticAnswerSample,
 )
-from app.research.rubrics import ANSWER_QUALITY_RUBRIC, QUESTION_QUALITY_RUBRIC
+from app.research.rubrics import (
+    ANSWER_QUALITY_RUBRIC,
+    QUESTION_QUALITY_RUBRIC,
+    TURN_EVIDENCE_RUBRIC,
+)
 from app.services.evaluation_service import ExpertConsensusService
 from app.services.llm_provider_service import LLMProviderError, LLMProviderService
 
@@ -29,9 +33,13 @@ ANSWER_AI_RUBRIC_VERSION = "answer-quality-ai-v1"
 QUESTION_JUDGE_PROMPT_VERSION = "question-ai-judge-v1"
 ANSWER_GENERATION_PROMPT_VERSION = "synthetic-answer-v1"
 ANSWER_JUDGE_PROMPT_VERSION = "answer-ai-judge-v1"
+TURN_EVIDENCE_AI_RUBRIC_VERSION = "turn-evidence-ai-v2"
+TURN_EVIDENCE_JUDGE_PROMPT_VERSION = "turn-evidence-ai-judge-v2"
+DEBIASED_ANSWER_GENERATION_PROMPT_VERSION = "synthetic-answer-v1.1"
 MINIMUM_AI_JUDGES = 3
 QUESTION_CRITERIA = tuple(QUESTION_QUALITY_RUBRIC["criteria"])
 ANSWER_CRITERIA = tuple(ANSWER_QUALITY_RUBRIC["criteria"])
+TURN_EVIDENCE_CRITERIA = tuple(TURN_EVIDENCE_RUBRIC["criteria"])
 
 
 @dataclass(frozen=True)
@@ -41,6 +49,7 @@ class AIJudgmentResult:
     recommendation: str
     prompt_hash: str
     latency_ms: int
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -48,6 +57,8 @@ class GeneratedAnswerResult:
     answer: str
     prompt_hash: str
     latency_ms: int
+    actual_word_count: int = 0
+    length_compliance: bool = True
 
 
 class WeakSupervisionEngine:
@@ -142,6 +153,15 @@ class WeakSupervisionEngine:
                     recommendation,
                     prompt_hash,
                     total_latency_ms,
+                    {
+                        key: data.get(key)
+                        for key in (
+                            "applicability",
+                            "missing_signals",
+                            "incorrect_claims",
+                        )
+                        if key in data
+                    },
                 )
             except ValueError as exc:
                 if attempt >= cls.JUDGMENT_MAX_ATTEMPTS:
@@ -203,9 +223,19 @@ class SyntheticAnswerEngine:
         4: "Correct, structured, and supported by a concrete example or sound reasoning.",
         5: "Excellent depth, precise reasoning, concrete evidence, trade-offs, and measurable outcomes.",
     }
+    LENGTH_GUIDANCE = {
+        "short": (20, 80),
+        "medium": (81, 170),
+        "long": (171, 320),
+    }
 
     @classmethod
-    def build_prompt(cls, output: QuestionBenchmarkOutput, target_quality_level: int) -> str:
+    def build_prompt(
+        cls,
+        output: QuestionBenchmarkOutput,
+        target_quality_level: int,
+        generation_metadata: dict[str, Any] | None = None,
+    ) -> str:
         benchmark_case = output.run.case
         context = {
             "cv_profile": benchmark_case.cv_profile_json,
@@ -214,13 +244,25 @@ class SyntheticAnswerEngine:
             "stage": benchmark_case.stage,
             "target_criterion": benchmark_case.criterion,
             "question": output.question_text,
+            "question_metadata": output.generation_metadata_json or {},
         }
         language = "Vietnamese" if benchmark_case.language == "vi" else "English"
+        metadata = generation_metadata or {}
+        length_band = str(metadata.get("target_length_band") or "").strip()
+        length_instruction = ""
+        if length_band in cls.LENGTH_GUIDANCE:
+            minimum, maximum = cls.LENGTH_GUIDANCE[length_band]
+            length_instruction = (
+                f" Target length band: {length_band}, approximately {minimum}-{maximum} words. "
+                "Length and quality are independent: a short answer can be excellent and a long "
+                "answer can be poor. Do not improve quality merely to fill the requested length."
+            )
         return (
             "Act as a synthetic job candidate for research data generation. Generate one answer only. "
             "Do not reveal the requested quality level and do not add grading commentary. "
             "Stay consistent with the supplied CV and never invent protected personal attributes. "
-            f"Answer language: {language}. Target quality behavior: {cls.QUALITY_GUIDANCE[target_quality_level]}\n"
+            f"Answer language: {language}. Target quality behavior: {cls.QUALITY_GUIDANCE[target_quality_level]}"
+            f"{length_instruction}\n"
             'Return valid JSON only: {"answer": string}.\n'
             f"Context: {json.dumps(context, ensure_ascii=False)}"
         )
@@ -231,17 +273,44 @@ class SyntheticAnswerEngine:
         output: QuestionBenchmarkOutput,
         model_name: str,
         target_quality_level: int,
+        generation_metadata: dict[str, Any] | None = None,
     ) -> GeneratedAnswerResult:
-        prompt = cls.build_prompt(output, target_quality_level)
-        data, prompt_hash, latency_ms = WeakSupervisionEngine.call_json(
-            model_name,
-            prompt,
-            "answer_generation",
-        )
-        answer = str(data.get("answer") or "").strip()
-        if len(answer) < 2 or len(answer) > 10000:
-            raise ValueError("Generator model returned an invalid synthetic answer")
-        return GeneratedAnswerResult(answer, prompt_hash, latency_ms)
+        prompt = cls.build_prompt(output, target_quality_level, generation_metadata)
+        length_band = str((generation_metadata or {}).get("target_length_band") or "")
+        target_range = cls.LENGTH_GUIDANCE.get(length_band)
+        total_latency_ms = 0
+        last_result: GeneratedAnswerResult | None = None
+        correction = ""
+        for attempt in range(1, 3):
+            data, prompt_hash, latency_ms = WeakSupervisionEngine.call_json(
+                model_name,
+                prompt + correction,
+                "answer_generation",
+            )
+            total_latency_ms += latency_ms
+            answer = str(data.get("answer") or "").strip()
+            if len(answer) < 2 or len(answer) > 10000:
+                raise ValueError("Generator model returned an invalid synthetic answer")
+            word_count = len(answer.split())
+            compliant = not target_range or target_range[0] <= word_count <= target_range[1]
+            last_result = GeneratedAnswerResult(
+                answer,
+                prompt_hash,
+                total_latency_ms,
+                word_count,
+                compliant,
+            )
+            if compliant or not target_range:
+                return last_result
+            if attempt == 1:
+                correction = (
+                    f"\nThe previous answer had {word_count} words and missed the required "
+                    f"{target_range[0]}-{target_range[1]} word range. Regenerate the same target "
+                    "quality without mentioning these instructions. Return JSON only."
+                )
+        if last_result is None:
+            raise AssertionError("unreachable")
+        return last_result
 
 
 class AnswerAIJudgeEngine:
@@ -283,6 +352,59 @@ class AnswerAIJudgeEngine:
             ANSWER_CRITERIA,
         )
 
+
+class TurnEvidenceAIJudgeEngine:
+    @staticmethod
+    def build_prompt(sample: SyntheticAnswerSample) -> str:
+        output = sample.question_output
+        benchmark_case = output.run.case
+        question_metadata = output.generation_metadata_json or {}
+        applicable = set(question_metadata.get("applicable_answer_criteria") or ())
+        applicability = {
+            criterion: criterion in applicable
+            for criterion in TURN_EVIDENCE_CRITERIA
+        }
+        context = {
+            "cv_profile": benchmark_case.cv_profile_json,
+            "job_profile": benchmark_case.job_profile_json,
+            "interview_history": benchmark_case.interview_history_json[-4:],
+            "stage": benchmark_case.stage,
+            "target_criterion": benchmark_case.criterion,
+            "question": output.question_text,
+            "question_type": question_metadata.get("question_type"),
+            "difficulty": question_metadata.get("difficulty"),
+            "required_signals": question_metadata.get("required_signals") or [],
+            "bonus_signals": question_metadata.get("bonus_signals") or [],
+            "contradiction_rules": question_metadata.get("contradiction_rules") or [],
+            "applicability": applicability,
+            "candidate_answer": sample.answer_text,
+        }
+        return (
+            "You are an independent blind judge of one interview turn. The answer generator, "
+            "requested quality, and requested length are hidden. Never reward verbosity by itself. "
+            "A concise answer can score 5 when it fully satisfies a concise question. Judge every "
+            "criterion from 1 through 5, but downstream training will mask criteria marked false in "
+            "the supplied applicability map. A score of 3 means acceptable basic evidence. Return "
+            "valid JSON only.\n"
+            f"Rubric: {json.dumps(TURN_EVIDENCE_RUBRIC, ensure_ascii=False)}\n"
+            '{"scores": {"answer_relevance": number, "technical_correctness": number, '
+            '"expected_signal_coverage": number, "reasoning_quality": number, '
+            '"evidence_quality": number, "clarity_conciseness": number, '
+            '"consistency": number}, "evidence": {"criterion_name": "brief evidence"}, '
+            '"applicability": {"criterion_name": boolean}, '
+            '"missing_signals": [string], "incorrect_claims": [string], '
+            '"recommendation": "accept|review|reject"}\n'
+            f"Evaluation context: {json.dumps(context, ensure_ascii=False)}"
+        )
+
+    @classmethod
+    def judge(cls, sample: SyntheticAnswerSample, model_name: str) -> AIJudgmentResult:
+        return WeakSupervisionEngine.call_judgment(
+            model_name,
+            cls.build_prompt(sample),
+            "turn_evidence_judgment",
+            TURN_EVIDENCE_CRITERIA,
+        )
 
 class WeakSupervisionService:
     @staticmethod
@@ -513,6 +635,77 @@ class WeakSupervisionService:
             item for item in sample.ai_judgments if item.rubric_version == ANSWER_AI_RUBRIC_VERSION
         ]
         return cls._consensus(annotations, ANSWER_CRITERIA)
+
+    @classmethod
+    def turn_evidence_consensus(cls, sample: SyntheticAnswerSample) -> dict[str, Any]:
+        annotations = [
+            item
+            for item in sample.ai_judgments
+            if item.rubric_version == TURN_EVIDENCE_AI_RUBRIC_VERSION
+        ]
+        if len(annotations) < MINIMUM_AI_JUDGES:
+            return {
+                "status": "insufficient_ai_judges",
+                "ai_judge_count": len(annotations),
+                "pseudo_label_scores": None,
+                "criterion_stats": {},
+                "applicability": {},
+                "mean_quality_score": None,
+                "needs_human_review": True,
+                "decision": "review",
+            }
+
+        output_metadata = sample.question_output.generation_metadata_json or {}
+        applicable_names = set(
+            output_metadata.get("applicable_answer_criteria") or ()
+        )
+        applicability = {
+            criterion: criterion in applicable_names
+            for criterion in TURN_EVIDENCE_CRITERIA
+        }
+        stats: dict[str, dict[str, float]] = {}
+        pseudo_labels: dict[str, float | None] = {}
+        disagreement = False
+        for criterion in TURN_EVIDENCE_CRITERIA:
+            if not applicability[criterion]:
+                pseudo_labels[criterion] = None
+                continue
+            values = [float(item.scores_json[criterion]) for item in annotations]
+            score_range = max(values) - min(values)
+            disagreement = disagreement or score_range >= 2
+            stats[criterion] = {
+                "median": round(float(statistics.median(values)), 3),
+                "mean": round(float(statistics.mean(values)), 3),
+                "standard_deviation": round(float(statistics.pstdev(values)), 3),
+                "minimum": round(min(values), 3),
+                "maximum": round(max(values), 3),
+            }
+            pseudo_labels[criterion] = stats[criterion]["median"]
+
+        usable_scores = [
+            float(score) for score in pseudo_labels.values() if score is not None
+        ]
+        mean_score = (
+            round(float(statistics.mean(usable_scores)), 3)
+            if usable_scores
+            else None
+        )
+        if mean_score is None:
+            decision = "review"
+        elif mean_score >= 3:
+            decision = "accept"
+        else:
+            decision = "review"
+        return {
+            "status": "pseudo_label_ready",
+            "ai_judge_count": len(annotations),
+            "pseudo_label_scores": pseudo_labels,
+            "criterion_stats": stats,
+            "applicability": applicability,
+            "mean_quality_score": mean_score,
+            "needs_human_review": disagreement or decision != "accept",
+            "decision": decision,
+        }
 
     @classmethod
     def create_answer_human_audit(

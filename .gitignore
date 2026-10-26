@@ -64,8 +64,11 @@ chromedriver.exe
 # Trained research artifacts (reproducible from annotated datasets)
 artifacts/*.joblib
 artifacts/*_metrics.json
+artifacts/weak_supervision/**/*.joblib
 data/research/question_ranking_dataset.csv
 data/research/answer_scoring_dataset.csv
+data/research/weak_supervision_*/all/*.csv
+data/research/weak_supervision_*/splits/*.csv
 data/research/generation_checkpoint.json
 data/research/generation_checkpoint.json.tmp
 data/research/*.joblib

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, JSON, String, Text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, JSON, String, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -11,6 +11,18 @@ class InterviewSession(Base):
 
     session_id = Column(String(36), primary_key=True)
     user_id = Column(Integer, nullable=True, index=True)
+    source_cv_id = Column(
+        Integer,
+        ForeignKey("cvs.cv_id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    source_job_id = Column(
+        Integer,
+        ForeignKey("jobs.job_id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     status = Column(String(20), nullable=False, default="active", index=True)
     language = Column(String(5), nullable=False, default="vi")
     max_questions = Column(Integer, nullable=False, default=8)
@@ -18,6 +30,7 @@ class InterviewSession(Base):
     current_stage = Column(String(40), nullable=False, default="introduction")
     allow_external_ai = Column(Boolean, nullable=False, default=False)
     research_consent = Column(Boolean, nullable=False, default=False)
+    context_source = Column(String(30), nullable=False, default="user_supplied")
 
     cv_text = Column(Text, nullable=False)
     jd_text = Column(Text, nullable=False)

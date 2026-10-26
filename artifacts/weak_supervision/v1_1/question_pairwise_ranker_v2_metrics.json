@@ -1,0 +1,214 @@
+{
+  "model": "Pairwise word+character TF-IDF logistic learning-to-rank",
+  "label_source": "multi_llm_consensus_pseudo_labels",
+  "dataset_rows": 1000,
+  "context_groups": 240,
+  "train_rows": 700,
+  "validation_rows": 144,
+  "test_rows": 156,
+  "train_context_groups": 168,
+  "validation_context_groups": 35,
+  "test_context_groups": 37,
+  "split_strategy": "precomputed_group_by_benchmark_case",
+  "selection_metric_order": [
+    "top_1_accuracy_tie_aware",
+    "mrr",
+    "pairwise_accuracy",
+    "ndcg"
+  ],
+  "hyperparameter_trials": [
+    {
+      "c": 0.1,
+      "pair_margin": 0.0,
+      "training_pairs": 866,
+      "symmetric_training_examples": 1732,
+      "skipped_tied_or_near_tied_pairs": 296,
+      "validation_metrics": {
+        "rows": 144,
+        "context_groups": 35,
+        "evaluated_ranking_groups": 35,
+        "tied_top_groups": 17,
+        "ndcg": 0.993867,
+        "top_1_accuracy_tie_aware": 0.542857,
+        "mrr": 0.747619,
+        "pairwise_accuracy": 0.636364,
+        "evaluated_pairs": 176
+      }
+    },
+    {
+      "c": 1.0,
+      "pair_margin": 0.0,
+      "training_pairs": 866,
+      "symmetric_training_examples": 1732,
+      "skipped_tied_or_near_tied_pairs": 296,
+      "validation_metrics": {
+        "rows": 144,
+        "context_groups": 35,
+        "evaluated_ranking_groups": 35,
+        "tied_top_groups": 17,
+        "ndcg": 0.993757,
+        "top_1_accuracy_tie_aware": 0.485714,
+        "mrr": 0.707143,
+        "pairwise_accuracy": 0.619318,
+        "evaluated_pairs": 176
+      }
+    },
+    {
+      "c": 10.0,
+      "pair_margin": 0.0,
+      "training_pairs": 866,
+      "symmetric_training_examples": 1732,
+      "skipped_tied_or_near_tied_pairs": 296,
+      "validation_metrics": {
+        "rows": 144,
+        "context_groups": 35,
+        "evaluated_ranking_groups": 35,
+        "tied_top_groups": 17,
+        "ndcg": 0.993287,
+        "top_1_accuracy_tie_aware": 0.514286,
+        "mrr": 0.707143,
+        "pairwise_accuracy": 0.596591,
+        "evaluated_pairs": 176
+      }
+    },
+    {
+      "c": 0.1,
+      "pair_margin": 0.1,
+      "training_pairs": 866,
+      "symmetric_training_examples": 1732,
+      "skipped_tied_or_near_tied_pairs": 296,
+      "validation_metrics": {
+        "rows": 144,
+        "context_groups": 35,
+        "evaluated_ranking_groups": 35,
+        "tied_top_groups": 17,
+        "ndcg": 0.993867,
+        "top_1_accuracy_tie_aware": 0.542857,
+        "mrr": 0.747619,
+        "pairwise_accuracy": 0.636364,
+        "evaluated_pairs": 176
+      }
+    },
+    {
+      "c": 1.0,
+      "pair_margin": 0.1,
+      "training_pairs": 866,
+      "symmetric_training_examples": 1732,
+      "skipped_tied_or_near_tied_pairs": 296,
+      "validation_metrics": {
+        "rows": 144,
+        "context_groups": 35,
+        "evaluated_ranking_groups": 35,
+        "tied_top_groups": 17,
+        "ndcg": 0.993757,
+        "top_1_accuracy_tie_aware": 0.485714,
+        "mrr": 0.707143,
+        "pairwise_accuracy": 0.619318,
+        "evaluated_pairs": 176
+      }
+    },
+    {
+      "c": 10.0,
+      "pair_margin": 0.1,
+      "training_pairs": 866,
+      "symmetric_training_examples": 1732,
+      "skipped_tied_or_near_tied_pairs": 296,
+      "validation_metrics": {
+        "rows": 144,
+        "context_groups": 35,
+        "evaluated_ranking_groups": 35,
+        "tied_top_groups": 17,
+        "ndcg": 0.993287,
+        "top_1_accuracy_tie_aware": 0.514286,
+        "mrr": 0.707143,
+        "pairwise_accuracy": 0.596591,
+        "evaluated_pairs": 176
+      }
+    },
+    {
+      "c": 0.1,
+      "pair_margin": 0.25,
+      "training_pairs": 431,
+      "symmetric_training_examples": 862,
+      "skipped_tied_or_near_tied_pairs": 731,
+      "validation_metrics": {
+        "rows": 144,
+        "context_groups": 35,
+        "evaluated_ranking_groups": 35,
+        "tied_top_groups": 17,
+        "ndcg": 0.993639,
+        "top_1_accuracy_tie_aware": 0.485714,
+        "mrr": 0.711905,
+        "pairwise_accuracy": 0.613636,
+        "evaluated_pairs": 176
+      }
+    },
+    {
+      "c": 1.0,
+      "pair_margin": 0.25,
+      "training_pairs": 431,
+      "symmetric_training_examples": 862,
+      "skipped_tied_or_near_tied_pairs": 731,
+      "validation_metrics": {
+        "rows": 144,
+        "context_groups": 35,
+        "evaluated_ranking_groups": 35,
+        "tied_top_groups": 17,
+        "ndcg": 0.992992,
+        "top_1_accuracy_tie_aware": 0.428571,
+        "mrr": 0.671429,
+        "pairwise_accuracy": 0.585227,
+        "evaluated_pairs": 176
+      }
+    },
+    {
+      "c": 10.0,
+      "pair_margin": 0.25,
+      "training_pairs": 431,
+      "symmetric_training_examples": 862,
+      "skipped_tied_or_near_tied_pairs": 731,
+      "validation_metrics": {
+        "rows": 144,
+        "context_groups": 35,
+        "evaluated_ranking_groups": 35,
+        "tied_top_groups": 17,
+        "ndcg": 0.992645,
+        "top_1_accuracy_tie_aware": 0.428571,
+        "mrr": 0.659524,
+        "pairwise_accuracy": 0.568182,
+        "evaluated_pairs": 176
+      }
+    }
+  ],
+  "selected_hyperparameters": {
+    "c": 0.1,
+    "pair_margin": 0.0
+  },
+  "selected_validation_metrics": {
+    "rows": 144,
+    "context_groups": 35,
+    "evaluated_ranking_groups": 35,
+    "tied_top_groups": 17,
+    "ndcg": 0.993867,
+    "top_1_accuracy_tie_aware": 0.542857,
+    "mrr": 0.747619,
+    "pairwise_accuracy": 0.636364,
+    "evaluated_pairs": 176
+  },
+  "final_pair_stats": {
+    "training_pairs": 1042,
+    "symmetric_training_examples": 2084,
+    "skipped_tied_or_near_tied_pairs": 352
+  },
+  "test_metrics": {
+    "rows": 156,
+    "context_groups": 37,
+    "evaluated_ranking_groups": 37,
+    "tied_top_groups": 18,
+    "ndcg": 0.993154,
+    "top_1_accuracy_tie_aware": 0.540541,
+    "mrr": 0.731338,
+    "pairwise_accuracy": 0.582011,
+    "evaluated_pairs": 189
+  }
+}

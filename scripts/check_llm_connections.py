@@ -15,6 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.core.config import settings
+from app.services.llm_provider_service import LLMProviderService
 
 
 PROMPT = "Reply with exactly: OK"
@@ -64,6 +65,31 @@ def _post_chat(
         raise RuntimeError("API returned an empty response")
 
 
+def _check_credential_pool(
+    *,
+    provider: str,
+    credentials: tuple[tuple[str, str], ...],
+    payload: dict[str, Any],
+    text_reader: Callable[[dict[str, Any]], str],
+) -> None:
+    if not credentials:
+        raise RuntimeError(f"No {provider} credential is configured")
+
+    last_error: Exception | None = None
+    for url, api_key in credentials:
+        try:
+            _post_chat(
+                url=url,
+                api_key=api_key,
+                payload=payload,
+                text_reader=text_reader,
+            )
+            return
+        except Exception as exc:
+            last_error = exc
+    raise RuntimeError(f"All configured {provider} credentials failed: {last_error}")
+
+
 def _openai_text(body: dict[str, Any]) -> str:
     return str(body["choices"][0]["message"]["content"])
 
@@ -88,9 +114,13 @@ def _ollama_text(body: dict[str, Any]) -> str:
 
 
 def check_groq() -> None:
-    _post_chat(
-        url="https://api.groq.com/openai/v1/chat/completions",
-        api_key=settings.GROQ_API_KEY,
+    credentials = tuple(
+        ("https://api.groq.com/openai/v1/chat/completions", key)
+        for key in LLMProviderService.groq_api_keys()
+    )
+    _check_credential_pool(
+        provider="Groq",
+        credentials=credentials,
         payload={
             "model": settings.GROQ_MODEL,
             "messages": [{"role": "user", "content": PROMPT}],
@@ -102,12 +132,17 @@ def check_groq() -> None:
 
 
 def check_cloudflare() -> None:
-    _post_chat(
-        url=(
+    credentials = tuple(
+        (
             "https://api.cloudflare.com/client/v4/accounts/"
-            f"{settings.CLOUDFLARE_ACCOUNT_ID}/ai/run/{settings.CLOUDFLARE_MODEL}"
-        ),
-        api_key=settings.CLOUDFLARE_API_TOKEN,
+            f"{account_id}/ai/run/{settings.CLOUDFLARE_MODEL}",
+            api_token,
+        )
+        for account_id, api_token in LLMProviderService.cloudflare_credentials()
+    )
+    _check_credential_pool(
+        provider="Cloudflare",
+        credentials=credentials,
         payload={
             "messages": [{"role": "user", "content": PROMPT}],
             "max_tokens": 256,
@@ -118,9 +153,13 @@ def check_cloudflare() -> None:
 
 
 def check_inception() -> None:
-    _post_chat(
-        url="https://api.inceptionlabs.ai/v1/chat/completions",
-        api_key=settings.INCEPTION_API_KEY,
+    credentials = tuple(
+        ("https://api.inceptionlabs.ai/v1/chat/completions", key)
+        for key in LLMProviderService.inception_api_keys()
+    )
+    _check_credential_pool(
+        provider="Inception",
+        credentials=credentials,
         payload={
             "model": settings.INCEPTION_MODEL,
             "messages": [{"role": "user", "content": PROMPT}],
@@ -133,9 +172,13 @@ def check_inception() -> None:
 
 
 def check_opentyphoon() -> None:
-    _post_chat(
-        url="https://api.opentyphoon.ai/v1/chat/completions",
-        api_key=settings.OPENTYPHOON_API_KEY,
+    credentials = tuple(
+        ("https://api.opentyphoon.ai/v1/chat/completions", key)
+        for key in LLMProviderService.opentyphoon_api_keys()
+    )
+    _check_credential_pool(
+        provider="OpenTyphoon",
+        credentials=credentials,
         payload={
             "model": settings.OPENTYPHOON_MODEL,
             "messages": [{"role": "user", "content": PROMPT}],
@@ -148,9 +191,13 @@ def check_opentyphoon() -> None:
 
 
 def check_ollama_cloud() -> None:
-    _post_chat(
-        url="https://ollama.com/api/chat",
-        api_key=settings.OLLAMA_API_KEY,
+    credentials = tuple(
+        ("https://ollama.com/api/chat", key)
+        for key in LLMProviderService.ollama_api_keys()
+    )
+    _check_credential_pool(
+        provider="Ollama Cloud",
+        credentials=credentials,
         payload={
             "model": settings.OLLAMA_CLOUD_MODEL,
             "messages": [{"role": "user", "content": PROMPT}],
@@ -163,9 +210,13 @@ def check_ollama_cloud() -> None:
 
 
 def check_nvidia_nemotron() -> None:
-    _post_chat(
-        url="https://integrate.api.nvidia.com/v1/chat/completions",
-        api_key=settings.NVIDIA_API_KEY,
+    credentials = tuple(
+        ("https://integrate.api.nvidia.com/v1/chat/completions", key)
+        for key in LLMProviderService.nvidia_api_keys()
+    )
+    _check_credential_pool(
+        provider="NVIDIA Nemotron",
+        credentials=credentials,
         payload={
             "model": settings.NVIDIA_NEMOTRON_MODEL,
             "messages": [{"role": "user", "content": PROMPT}],
@@ -180,35 +231,40 @@ def check_nvidia_nemotron() -> None:
 
 def main() -> int:
     providers = [
-        ("groq", settings.GROQ_MODEL, bool(settings.GROQ_API_KEY), check_groq),
+        (
+            "groq",
+            settings.GROQ_MODEL,
+            bool(LLMProviderService.groq_api_keys()),
+            check_groq,
+        ),
         (
             "cloudflare",
             settings.CLOUDFLARE_MODEL,
-            bool(settings.CLOUDFLARE_ACCOUNT_ID and settings.CLOUDFLARE_API_TOKEN),
+            bool(LLMProviderService.cloudflare_credentials()),
             check_cloudflare,
         ),
         (
             "inception",
             settings.INCEPTION_MODEL,
-            bool(settings.INCEPTION_API_KEY),
+            bool(LLMProviderService.inception_api_keys()),
             check_inception,
         ),
         (
             "opentyphoon",
             settings.OPENTYPHOON_MODEL,
-            bool(settings.OPENTYPHOON_API_KEY),
+            bool(LLMProviderService.opentyphoon_api_keys()),
             check_opentyphoon,
         ),
         (
             "ollama_cloud",
             settings.OLLAMA_CLOUD_MODEL,
-            bool(settings.OLLAMA_API_KEY),
+            bool(LLMProviderService.ollama_api_keys()),
             check_ollama_cloud,
         ),
         (
             "nvidia_nemotron",
             settings.NVIDIA_NEMOTRON_MODEL,
-            bool(settings.NVIDIA_API_KEY),
+            bool(LLMProviderService.nvidia_api_keys()),
             check_nvidia_nemotron,
         ),
     ]

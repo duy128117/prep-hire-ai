@@ -16,7 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from sqlalchemy import func
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.config import settings
 from app.db.session import get_standalone_db
@@ -44,16 +44,22 @@ from app.services.weak_supervision_service import (
     ANSWER_AI_RUBRIC_VERSION,
     ANSWER_GENERATION_PROMPT_VERSION,
     ANSWER_JUDGE_PROMPT_VERSION,
+    DEBIASED_ANSWER_GENERATION_PROMPT_VERSION,
     QUESTION_AI_RUBRIC_VERSION,
     QUESTION_JUDGE_PROMPT_VERSION,
+    TURN_EVIDENCE_AI_RUBRIC_VERSION,
+    TURN_EVIDENCE_CRITERIA,
+    TURN_EVIDENCE_JUDGE_PROMPT_VERSION,
     AnswerAIJudgeEngine,
     QuestionAIJudgeEngine,
     SyntheticAnswerEngine,
+    TurnEvidenceAIJudgeEngine,
 )
 
 
-DATASET_PROMPT_VERSION = "balanced-weak-v1"
-DEFAULT_CHECKPOINT = Path("data/research/generation_checkpoint.json")
+LEGACY_DATASET_PROMPT_VERSION = "balanced-weak-v1"
+DATASET_PROMPT_VERSION = "balanced-weak-v1.1"
+DEFAULT_CHECKPOINT = Path("data/research/generation_checkpoint_v1_1.json")
 SYNTHETIC_CASE_PREFIX = "SYNTH-JOB-"
 PROFILE_LEVELS = (
     ("intern", 0.0, 0.40),
@@ -64,6 +70,10 @@ PROFILE_LEVELS = (
 )
 ACTIVE_PROVIDER_COUNT = 4
 LOGICAL_SLOT_NAMES = ("slot_1", "slot_2", "slot_3", "slot_4")
+ANSWER_LENGTH_BANDS = ("short", "medium", "long")
+CHECKPOINT_REPLACE_ATTEMPTS = 5
+CHECKPOINT_DIRECT_WRITE_ATTEMPTS = 20
+CHECKPOINT_RETRY_DELAY_SECONDS = 0.1
 
 
 class ProviderTokenBudgetReached(RuntimeError):
@@ -128,10 +138,30 @@ class GenerationLedger:
 
         transient_markers = (
             "rate limit",
+            "http 401",
+            "http 402",
+            "http 403",
             "http 429",
             "too many requests",
+            "authentication",
+            "invalid api key",
+            "unauthorized",
+            "forbidden",
+            "missing credentials",
+            "insufficient balance",
+            "quota exhausted",
+            "quota_exhausted",
+            "tokens per day",
+            "requests per day",
+            "daily limit",
+            "daily quota",
             "network request failed",
             "network_error",
+            "failed to generate json",
+            "failed_generation",
+            "generation_failed",
+            "invalid_content",
+            "did not generate a valid question",
             "connection reset",
             "timed out",
             "http 5",
@@ -315,11 +345,29 @@ class GenerationLedger:
         self.state["updated_at"] = datetime.now(timezone.utc).isoformat()
         self.path.parent.mkdir(parents=True, exist_ok=True)
         temporary = self.path.with_suffix(self.path.suffix + ".tmp")
+        payload = json.dumps(self.state, ensure_ascii=False, indent=2)
         temporary.write_text(
-            json.dumps(self.state, ensure_ascii=False, indent=2),
+            payload,
             encoding="utf-8",
         )
-        temporary.replace(self.path)
+        for attempt in range(1, CHECKPOINT_REPLACE_ATTEMPTS + 1):
+            try:
+                temporary.replace(self.path)
+                return
+            except PermissionError:
+                if attempt < CHECKPOINT_REPLACE_ATTEMPTS:
+                    time.sleep(min(0.5, CHECKPOINT_RETRY_DELAY_SECONDS * attempt))
+
+        # Windows can deny replacing a file that a monitoring shell has open.
+        # A direct write does not require delete-sharing on the destination.
+        for attempt in range(1, CHECKPOINT_DIRECT_WRITE_ATTEMPTS + 1):
+            try:
+                self.path.write_text(payload, encoding="utf-8")
+                return
+            except PermissionError:
+                if attempt >= CHECKPOINT_DIRECT_WRITE_ATTEMPTS:
+                    raise
+                time.sleep(min(0.5, CHECKPOINT_RETRY_DELAY_SECONDS * attempt))
 
     def record(self, call: LLMCallRecord) -> None:
         provider = self.state["providers"].setdefault(
@@ -354,6 +402,14 @@ class GenerationLedger:
                 "error_code": call.error_code,
                 "quota_exhausted": call.quota_exhausted,
             }
+        else:
+            last_error = self.state.get("last_error")
+            if (
+                isinstance(last_error, dict)
+                and last_error.get("provider") == call.provider
+                and last_error.get("operation") == call.operation
+            ):
+                self.state["last_error"] = None
         self.save()
 
         if self.token_budget and provider["total_tokens"] >= self.token_budget:
@@ -388,12 +444,22 @@ class GenerationLedger:
         self.save()
 
 
-def _complete_outputs(db: Session) -> list[QuestionBenchmarkOutput]:
+def _complete_outputs(
+    db: Session,
+    prompt_version: str = DATASET_PROMPT_VERSION,
+    answer_rubric_version: str = TURN_EVIDENCE_AI_RUBRIC_VERSION,
+) -> list[QuestionBenchmarkOutput]:
     outputs = (
         db.query(QuestionBenchmarkOutput)
+        .options(
+            selectinload(QuestionBenchmarkOutput.ai_judgments),
+            selectinload(QuestionBenchmarkOutput.synthetic_answers).selectinload(
+                SyntheticAnswerSample.ai_judgments
+            ),
+        )
         .join(QuestionBenchmarkRun)
         .filter(
-            QuestionBenchmarkRun.prompt_version == DATASET_PROMPT_VERSION,
+            QuestionBenchmarkRun.prompt_version == prompt_version,
             QuestionBenchmarkOutput.status == "success",
         )
         .all()
@@ -410,7 +476,7 @@ def _complete_outputs(db: Session) -> list[QuestionBenchmarkOutput]:
             and len({
                 item.judge_model_name
                 for item in sample.ai_judgments
-                if item.rubric_version == ANSWER_AI_RUBRIC_VERSION
+                if item.rubric_version == answer_rubric_version
             }) >= 3
             for sample in output.synthetic_answers
         )
@@ -437,6 +503,7 @@ def generation_status(db: Session) -> dict[str, Any]:
         if slot_name:
             slot_counts[slot_name] += 1
     return {
+        "dataset_prompt_version": DATASET_PROMPT_VERSION,
         "benchmark_cases": db.query(func.count(QuestionBenchmarkCase.case_id)).scalar() or 0,
         "synthetic_benchmark_cases": (
             db.query(func.count(QuestionBenchmarkCase.case_id))
@@ -452,6 +519,13 @@ def generation_status(db: Session) -> dict[str, Any]:
         ),
         "available_jobs": db.query(func.count(Job.job_id)).scalar() or 0,
         "complete_sets": len(complete),
+        "legacy_v1_complete_sets": len(
+            _complete_outputs(
+                db,
+                LEGACY_DATASET_PROMPT_VERSION,
+                ANSWER_AI_RUBRIC_VERSION,
+            )
+        ),
         "generator_counts": generator_counts,
         "logical_slot_counts": slot_counts,
         "balanced": len(set(slot_counts.values())) <= 1,
@@ -489,7 +563,13 @@ def failover_worthy(exc: BaseException) -> bool:
         return False
     return (
         exc.quota_exhausted
-        or exc.error_code in {"missing_credentials", "network_error", "invalid_json"}
+        or exc.error_code in {
+            "missing_credentials",
+            "network_error",
+            "invalid_json",
+            "invalid_content",
+            "generation_failed",
+        }
         or exc.status_code in {401, 402, 403, 429}
         or (exc.status_code is not None and exc.status_code >= 500)
     )
@@ -530,6 +610,31 @@ def grouped_case_index(
         raise ValueError("grouped generation must start on a complete provider round")
     grouped_round = completed_grouped_sets // provider_count
     return (grouped_context_start_set + grouped_round) % case_count
+
+
+def answer_generation_plan(set_index: int) -> dict[str, Any]:
+    if set_index < 0:
+        raise ValueError("set_index cannot be negative")
+    quality_level = (set_index % 5) + 1
+    length_band = ANSWER_LENGTH_BANDS[(set_index // 5) % len(ANSWER_LENGTH_BANDS)]
+    if length_band == "short" and quality_level >= 4:
+        counterfactual_type = "concise_strong"
+    elif length_band == "long" and quality_level <= 2:
+        counterfactual_type = "verbose_weak"
+    elif length_band == "long" and quality_level >= 4:
+        counterfactual_type = "detailed_strong"
+    elif length_band == "short" and quality_level <= 2:
+        counterfactual_type = "concise_weak"
+    else:
+        counterfactual_type = "standard"
+    minimum, maximum = SyntheticAnswerEngine.LENGTH_GUIDANCE[length_band]
+    return {
+        "schema_version": "weak-supervision-v1.1",
+        "target_quality_level": quality_level,
+        "target_length_band": length_band,
+        "target_word_range": [minimum, maximum],
+        "counterfactual_type": counterfactual_type,
+    }
 
 
 def seed_synthetic_cases(db: Session) -> dict[str, int]:
@@ -650,6 +755,7 @@ def _make_question(
     logical_slot: str,
     generator: LLMProviderSpec,
     roster: tuple[LLMProviderSpec, ...],
+    difficulty: int,
 ) -> QuestionBenchmarkOutput:
     run = QuestionBenchmarkRun(
         run_id=str(uuid.uuid4()),
@@ -673,9 +779,18 @@ def _make_question(
         model_name=generator.model,
         provider=generator.provider,
         strict_external_ai=True,
+        generation_controls={
+            "schema_version": "weak-supervision-v1.1",
+            "difficulty": difficulty,
+            "length_bias_policy": "Question scope must permit concise sufficient answers.",
+        },
     )
     if generated.source != "ai" or not generated.question:
-        raise RuntimeError(f"{generator.provider} did not generate a valid question")
+        raise LLMProviderError(
+            generator.provider,
+            f"{generator.provider} did not generate a valid question",
+            error_code="invalid_content",
+        )
 
     output = QuestionBenchmarkOutput(
         output_id=str(uuid.uuid4()),
@@ -688,6 +803,15 @@ def _make_question(
         question_text=generated.question,
         criterion=generated.criterion,
         expected_signal=generated.expected_signal,
+        generation_metadata_json={
+            "schema_version": "weak-supervision-v1.1",
+            "question_type": generated.question_type,
+            "difficulty": generated.difficulty,
+            "required_signals": list(generated.required_signals),
+            "bonus_signals": list(generated.bonus_signals),
+            "applicable_answer_criteria": list(generated.applicable_answer_criteria),
+            "contradiction_rules": list(generated.contradiction_rules),
+        },
         latency_ms=generated.latency_ms,
         prompt_hash=generated.prompt_hash,
     )
@@ -718,10 +842,21 @@ def _make_answer(
     db: Session,
     output: QuestionBenchmarkOutput,
     generator: LLMProviderSpec,
-    quality_level: int,
+    generation_plan: dict[str, Any],
     roster: tuple[LLMProviderSpec, ...],
 ) -> SyntheticAnswerSample:
-    generated = SyntheticAnswerEngine.generate(output, generator.model, quality_level)
+    quality_level = int(generation_plan["target_quality_level"])
+    generated = SyntheticAnswerEngine.generate(
+        output,
+        generator.model,
+        quality_level,
+        generation_plan,
+    )
+    stored_metadata = {
+        **generation_plan,
+        "actual_word_count": generated.actual_word_count,
+        "length_compliance": generated.length_compliance,
+    }
     sample = SyntheticAnswerSample(
         sample_id=str(uuid.uuid4()),
         question_output_id=output.output_id,
@@ -729,9 +864,10 @@ def _make_answer(
         provider=generator.provider,
         generator_model_name=generator.model,
         target_quality_level=quality_level,
+        generation_metadata_json=stored_metadata,
         status="success",
         answer_text=generated.answer,
-        prompt_version=ANSWER_GENERATION_PROMPT_VERSION,
+        prompt_version=DEBIASED_ANSWER_GENERATION_PROMPT_VERSION,
         prompt_hash=generated.prompt_hash,
         generation_latency_ms=generated.latency_ms,
     )
@@ -741,16 +877,30 @@ def _make_answer(
     for judge in roster:
         if judge.provider == generator.provider:
             continue
-        result = AnswerAIJudgeEngine.judge(sample, judge.model)
+        result = TurnEvidenceAIJudgeEngine.judge(sample, judge.model)
+        applicable = set(
+            (output.generation_metadata_json or {}).get(
+                "applicable_answer_criteria",
+                TURN_EVIDENCE_CRITERIA,
+            )
+        )
         db.add(AnswerAIJudgment(
             sample_id=sample.sample_id,
             provider=judge.provider,
             judge_model_name=judge.model,
-            rubric_version=ANSWER_AI_RUBRIC_VERSION,
+            rubric_version=TURN_EVIDENCE_AI_RUBRIC_VERSION,
             scores_json=result.scores,
-            evidence_json=result.evidence,
+            evidence_json={
+                "criteria": result.evidence,
+                "applicability": {
+                    criterion: criterion in applicable
+                    for criterion in TURN_EVIDENCE_CRITERIA
+                },
+                "missing_signals": result.metadata.get("missing_signals") or [],
+                "incorrect_claims": result.metadata.get("incorrect_claims") or [],
+            },
             recommendation=result.recommendation,
-            prompt_version=ANSWER_JUDGE_PROMPT_VERSION,
+            prompt_version=TURN_EVIDENCE_JUDGE_PROMPT_VERSION,
             prompt_hash=result.prompt_hash,
             latency_ms=result.latency_ms,
         ))
@@ -828,17 +978,19 @@ def generate(
                     grouped_context_start_set,
                 )
                 benchmark_case = cases[case_index]
+                difficulty = ((round_start // ACTIVE_PROVIDER_COUNT) % 5) + 1
                 for offset, (logical_slot, generator) in enumerate(assignments):
                     set_index = round_start + offset
-                    quality_level = (set_index % 5) + 1
+                    generation_plan = answer_generation_plan(set_index)
                     output = _make_question(
                         db,
                         benchmark_case,
                         logical_slot,
                         generator,
                         providers,
+                        difficulty,
                     )
-                    _make_answer(db, output, generator, quality_level, providers)
+                    _make_answer(db, output, generator, generation_plan, providers)
                     output.run.status = "completed"
             db.commit()
         except BaseException as exc:

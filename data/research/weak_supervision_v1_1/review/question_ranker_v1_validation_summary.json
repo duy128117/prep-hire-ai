@@ -1,0 +1,25 @@
+{
+  "model_type": "question_quality_ranker",
+  "dataset": "data\\research\\weak_supervision_v1_1\\splits\\question_validation.csv",
+  "artifact": "artifacts\\weak_supervision\\v1_1\\question_quality_ranker.joblib",
+  "ranking_metrics": {
+    "rows": 144,
+    "context_groups": 35,
+    "evaluated_ranking_groups": 35,
+    "tied_top_groups": 17,
+    "ndcg": 0.997745,
+    "top_1_accuracy_tie_aware": 0.714286,
+    "mrr": 0.845238,
+    "pairwise_accuracy": 0.8125,
+    "evaluated_pairs": 176
+  },
+  "rows": 144,
+  "context_groups": 35,
+  "correct_top_1_groups": 25,
+  "incorrect_top_1_groups": 10,
+  "review_groups": 10,
+  "review_rows": 44,
+  "predictions_output": "data\\research\\weak_supervision_v1_1\\review\\question_ranker_v1_validation_predictions.csv",
+  "blind_review_output": "data\\research\\weak_supervision_v1_1\\review\\question_ranker_v1_validation_blind_review.csv",
+  "review_key_output": "data\\research\\weak_supervision_v1_1\\review\\question_ranker_v1_validation_review_key.csv"
+}

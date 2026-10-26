@@ -86,6 +86,66 @@ def capture_llm_usage(sink: UsageSink) -> Iterator[None]:
 class LLMProviderService:
     REQUEST_TIMEOUT_SECONDS = 60
     MAX_NETWORK_ATTEMPTS = 3
+    MAX_CREDENTIAL_SLOTS = 13
+    _key_cursors: dict[str, int] = {}
+
+    @staticmethod
+    def _unique_keys(*values: str) -> tuple[str, ...]:
+        keys: list[str] = []
+        for value in values:
+            key = (value or "").strip()
+            if key and key not in keys:
+                keys.append(key)
+        return tuple(keys)
+
+    @classmethod
+    def _numbered_setting_values(cls, prefix: str) -> tuple[str, ...]:
+        values = [getattr(settings, prefix, "")]
+        values.extend(
+            getattr(settings, f"{prefix}_{slot}", "")
+            for slot in range(2, cls.MAX_CREDENTIAL_SLOTS + 1)
+        )
+        return cls._unique_keys(*values)
+
+    @classmethod
+    def groq_api_keys(cls) -> tuple[str, ...]:
+        return cls._numbered_setting_values("GROQ_API_KEY")
+
+    @classmethod
+    def inception_api_keys(cls) -> tuple[str, ...]:
+        return cls._numbered_setting_values("INCEPTION_API_KEY")
+
+    @classmethod
+    def opentyphoon_api_keys(cls) -> tuple[str, ...]:
+        return cls._numbered_setting_values("OPENTYPHOON_API_KEY")
+
+    @classmethod
+    def ollama_api_keys(cls) -> tuple[str, ...]:
+        return cls._numbered_setting_values("OLLAMA_API_KEY")
+
+    @classmethod
+    def nvidia_api_keys(cls) -> tuple[str, ...]:
+        return cls._numbered_setting_values("NVIDIA_API_KEY")
+
+    @classmethod
+    def cloudflare_credentials(cls) -> tuple[tuple[str, str], ...]:
+        credentials: list[tuple[str, str]] = []
+        for slot in range(1, cls.MAX_CREDENTIAL_SLOTS + 1):
+            suffix = "" if slot == 1 else f"_{slot}"
+            account_id = getattr(settings, f"CLOUDFLARE_ACCOUNT_ID{suffix}", "")
+            api_token = getattr(settings, f"CLOUDFLARE_API_TOKEN{suffix}", "")
+            credential = ((account_id or "").strip(), (api_token or "").strip())
+            if all(credential) and credential not in credentials:
+                credentials.append(credential)
+        return tuple(credentials)
+
+    @staticmethod
+    def _key_failover_worthy(error: LLMProviderError) -> bool:
+        return (
+            error.quota_exhausted
+            or error.error_code == "generation_failed"
+            or error.status_code in {401, 402, 403, 429}
+        )
 
     @staticmethod
     def pool_specs() -> tuple[LLMProviderSpec, ...]:
@@ -114,17 +174,15 @@ class LLMProviderService:
                 return spec
         raise ValueError(f"Unknown configured LLM provider or model: {provider_or_model}")
 
-    @staticmethod
-    def _configured(spec: LLMProviderSpec) -> bool:
+    @classmethod
+    def _configured(cls, spec: LLMProviderSpec) -> bool:
         return {
-            "groq": bool(settings.GROQ_API_KEY),
-            "cloudflare": bool(
-                settings.CLOUDFLARE_ACCOUNT_ID and settings.CLOUDFLARE_API_TOKEN
-            ),
-            "inception": bool(settings.INCEPTION_API_KEY),
-            "opentyphoon": bool(settings.OPENTYPHOON_API_KEY),
-            "ollama_cloud": bool(settings.OLLAMA_API_KEY),
-            "nvidia_nemotron": bool(settings.NVIDIA_API_KEY),
+            "groq": bool(cls.groq_api_keys()),
+            "cloudflare": bool(cls.cloudflare_credentials()),
+            "inception": bool(cls.inception_api_keys()),
+            "opentyphoon": bool(cls.opentyphoon_api_keys()),
+            "ollama_cloud": bool(cls.ollama_api_keys()),
+            "nvidia_nemotron": bool(cls.nvidia_api_keys()),
         }[spec.provider]
 
     @classmethod
@@ -304,11 +362,47 @@ class LLMProviderService:
                 provider,
                 f"{provider} API error: {detail}",
                 status_code=response.status_code,
-                error_code="quota_exhausted"
-                if cls._is_quota_error(response.status_code, detail)
-                else "http_error",
+                error_code=(
+                    "quota_exhausted"
+                    if cls._is_quota_error(response.status_code, detail)
+                    else "generation_failed"
+                    if retryable_generation_error
+                    else "http_error"
+                ),
                 quota_exhausted=cls._is_quota_error(response.status_code, detail),
             )
+        raise AssertionError("unreachable")
+
+    @classmethod
+    def _post_json_with_credential_pool(
+        cls,
+        provider: str,
+        credentials: tuple[tuple[str, str], ...],
+        payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        if not credentials:
+            raise LLMProviderError(
+                provider,
+                f"Missing credentials for {provider}",
+                error_code="missing_credentials",
+            )
+
+        start = cls._key_cursors.get(provider, 0) % len(credentials)
+        for offset in range(len(credentials)):
+            credential_index = (start + offset) % len(credentials)
+            url, api_key = credentials[credential_index]
+            try:
+                body = cls._post_json(provider, url, api_key, payload)
+            except LLMProviderError as exc:
+                has_next_credential = offset + 1 < len(credentials)
+                if not has_next_credential or not cls._key_failover_worthy(exc):
+                    raise
+                cls._key_cursors[provider] = (credential_index + 1) % len(credentials)
+                continue
+
+            cls._key_cursors[provider] = credential_index
+            return body
+
         raise AssertionError("unreachable")
 
     @staticmethod
@@ -329,17 +423,19 @@ class LLMProviderService:
     def _call_groq(
         cls, spec: LLMProviderSpec, prompt: str, max_output_tokens: int, temperature: float
     ) -> tuple[str, TokenUsage]:
-        body = cls._post_json(
-            spec.provider,
-            "https://api.groq.com/openai/v1/chat/completions",
-            settings.GROQ_API_KEY,
-            {
-                "model": spec.model,
-                "messages": [{"role": "user", "content": prompt}],
-                "max_completion_tokens": max_output_tokens,
-                "temperature": temperature,
-                "response_format": {"type": "json_object"},
-            },
+        payload = {
+            "model": spec.model,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_completion_tokens": max_output_tokens,
+            "temperature": temperature,
+            "response_format": {"type": "json_object"},
+        }
+        credentials = tuple(
+            ("https://api.groq.com/openai/v1/chat/completions", key)
+            for key in cls.groq_api_keys()
+        )
+        body = cls._post_json_with_credential_pool(
+            spec.provider, credentials, payload
         )
         text = str(body.get("choices", [{}])[0].get("message", {}).get("content") or "")
         return text, cls._openai_usage(body)
@@ -348,13 +444,17 @@ class LLMProviderService:
     def _call_cloudflare(
         cls, spec: LLMProviderSpec, prompt: str, max_output_tokens: int, temperature: float
     ) -> tuple[str, TokenUsage]:
-        body = cls._post_json(
-            spec.provider,
+        credentials = tuple(
             (
                 "https://api.cloudflare.com/client/v4/accounts/"
-                f"{settings.CLOUDFLARE_ACCOUNT_ID}/ai/run/{spec.model}"
-            ),
-            settings.CLOUDFLARE_API_TOKEN,
+                f"{account_id}/ai/run/{spec.model}",
+                api_token,
+            )
+            for account_id, api_token in cls.cloudflare_credentials()
+        )
+        body = cls._post_json_with_credential_pool(
+            spec.provider,
+            credentials,
             {
                 "messages": [{"role": "user", "content": prompt}],
                 "max_tokens": max_output_tokens,
@@ -382,16 +482,20 @@ class LLMProviderService:
     def _call_inception(
         cls, spec: LLMProviderSpec, prompt: str, max_output_tokens: int, temperature: float
     ) -> tuple[str, TokenUsage]:
-        body = cls._post_json(
+        credentials = tuple(
+            ("https://api.inceptionlabs.ai/v1/chat/completions", key)
+            for key in cls.inception_api_keys()
+        )
+        body = cls._post_json_with_credential_pool(
             spec.provider,
-            "https://api.inceptionlabs.ai/v1/chat/completions",
-            settings.INCEPTION_API_KEY,
+            credentials,
             {
                 "model": spec.model,
                 "messages": [{"role": "user", "content": prompt}],
                 "max_completion_tokens": max_output_tokens,
                 "temperature": temperature,
                 "reasoning_effort": "low",
+                "response_format": {"type": "json_object"},
             },
         )
         message = body.get("choices", [{}])[0].get("message", {})
@@ -402,10 +506,13 @@ class LLMProviderService:
     def _call_opentyphoon(
         cls, spec: LLMProviderSpec, prompt: str, max_output_tokens: int, temperature: float
     ) -> tuple[str, TokenUsage]:
-        body = cls._post_json(
+        credentials = tuple(
+            ("https://api.opentyphoon.ai/v1/chat/completions", key)
+            for key in cls.opentyphoon_api_keys()
+        )
+        body = cls._post_json_with_credential_pool(
             spec.provider,
-            "https://api.opentyphoon.ai/v1/chat/completions",
-            settings.OPENTYPHOON_API_KEY,
+            credentials,
             {
                 "model": spec.model,
                 "messages": [{"role": "user", "content": prompt}],
@@ -422,10 +529,13 @@ class LLMProviderService:
     def _call_ollama_cloud(
         cls, spec: LLMProviderSpec, prompt: str, max_output_tokens: int, temperature: float
     ) -> tuple[str, TokenUsage]:
-        body = cls._post_json(
+        credentials = tuple(
+            ("https://ollama.com/api/chat", key)
+            for key in cls.ollama_api_keys()
+        )
+        body = cls._post_json_with_credential_pool(
             spec.provider,
-            "https://ollama.com/api/chat",
-            settings.OLLAMA_API_KEY,
+            credentials,
             {
                 "model": spec.model,
                 "messages": [{"role": "user", "content": prompt}],
@@ -445,10 +555,13 @@ class LLMProviderService:
     def _call_nvidia_nemotron(
         cls, spec: LLMProviderSpec, prompt: str, max_output_tokens: int, temperature: float
     ) -> tuple[str, TokenUsage]:
-        body = cls._post_json(
+        credentials = tuple(
+            ("https://integrate.api.nvidia.com/v1/chat/completions", key)
+            for key in cls.nvidia_api_keys()
+        )
+        body = cls._post_json_with_credential_pool(
             spec.provider,
-            "https://integrate.api.nvidia.com/v1/chat/completions",
-            settings.NVIDIA_API_KEY,
+            credentials,
             {
                 "model": spec.model,
                 "messages": [{"role": "user", "content": prompt}],

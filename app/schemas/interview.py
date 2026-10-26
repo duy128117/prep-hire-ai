@@ -40,6 +40,43 @@ class InterviewSessionCreateRequest(InterviewContextRequest):
         return normalized
 
 
+class SyntheticInterviewSessionCreateRequest(BaseModel):
+    seed: int = Field(default=1, ge=0, le=2_147_483_647)
+    role: str | None = Field(default=None, pattern="^(backend|frontend|data|devops|qa|mobile)$")
+    level: str | None = Field(default=None, pattern="^(intern|junior|middle|senior)$")
+    language: str = Field(default="vi", pattern="^(vi|en)$")
+    max_questions: int = Field(default=5, ge=5, le=15)
+    allow_external_ai: bool = False
+
+
+class StoredInterviewSessionCreateRequest(BaseModel):
+    cv_id: int = Field(..., ge=1)
+    job_id: int = Field(..., ge=1)
+    language: str = Field(default="vi", pattern="^(vi|en)$")
+    max_questions: int = Field(default=8, ge=5, le=15)
+    allow_external_ai: bool = True
+
+
+class StoredCvOption(BaseModel):
+    cv_id: int
+    file_name: str
+    uploaded_at: datetime
+    fallback_ready: bool
+
+
+class StoredJobOption(BaseModel):
+    job_id: int
+    title: str
+    company_name: str | None = None
+    location: str | None = None
+    level: str | None = None
+
+
+class StoredInterviewOptionsResponse(BaseModel):
+    cvs: list[StoredCvOption] = Field(default_factory=list)
+    jobs: list[StoredJobOption] = Field(default_factory=list)
+
+
 class InterviewAnswerRequest(BaseModel):
     answer: str = Field(..., min_length=2, max_length=10000)
 
@@ -50,13 +87,56 @@ class InterviewQuestionResponse(BaseModel):
     question: str
 
 
+class InterviewQuestionCandidateResponse(BaseModel):
+    provider_name: str | None = None
+    model_name: str | None = None
+    question: str
+    criterion: str | None = None
+    question_type: str | None = None
+    difficulty: int | None = None
+    pairwise_utility: float | None = None
+    selected: bool = False
+    generation_latency_ms: int = 0
+
+
 class InterviewTurnResponse(InterviewQuestionResponse):
     answer: str | None = None
     question_source: str
+    provider_name: str | None = None
     model_name: str | None = None
     generation_latency_ms: int
+    question_candidate_count: int = 1
+    question_candidates: list[InterviewQuestionCandidateResponse] = Field(
+        default_factory=list
+    )
+    selected_question_score: float | None = None
+    question_ranker_version: str | None = None
+    question_selection_latency_ms: int = 0
+    answer_evidence: dict | None = None
+    answer_scorer_version: str | None = None
+    answer_scoring_latency_ms: int = 0
     created_at: datetime
     answered_at: datetime | None = None
+
+
+class RealtimeInterviewModelStatusResponse(BaseModel):
+    multi_provider_enabled: bool
+    question_candidate_count: int
+    configured_providers: list[str] = Field(default_factory=list)
+    question_ranker: dict
+    answer_scorer: dict
+
+
+class InterviewEvidenceSummaryResponse(BaseModel):
+    summary_id: int
+    session_id: str
+    aggregator_version: str
+    status: str
+    competencies: dict
+    evidence: dict
+    flags: list[dict] = Field(default_factory=list)
+    created_at: datetime
+    updated_at: datetime
 
 
 class InterviewSessionResponse(BaseModel):
@@ -67,6 +147,9 @@ class InterviewSessionResponse(BaseModel):
     current_stage: str
     allow_external_ai: bool
     research_consent: bool
+    context_source: str = "user_supplied"
+    source_cv_id: int | None = None
+    source_job_id: int | None = None
     current_question: InterviewQuestionResponse | None = None
     turns: list[InterviewTurnResponse] = Field(default_factory=list)
     created_at: datetime

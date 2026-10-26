@@ -1,0 +1,65 @@
+{
+  "selection_policy": "Choose on validation only, ordered by tie-aware Top-1, MRR, pairwise accuracy, then NDCG. Test is reporting-only.",
+  "selected_model": "v2_pairwise",
+  "v2_promoted": true,
+  "validation": {
+    "v1_pointwise": {
+      "rows": 144,
+      "context_groups": 35,
+      "evaluated_ranking_groups": 35,
+      "tied_top_groups": 17,
+      "ndcg": 0.993162,
+      "top_1_accuracy_tie_aware": 0.542857,
+      "mrr": 0.728571,
+      "pairwise_accuracy": 0.602273,
+      "evaluated_pairs": 176
+    },
+    "v2_pairwise": {
+      "rows": 144,
+      "context_groups": 35,
+      "evaluated_ranking_groups": 35,
+      "tied_top_groups": 17,
+      "ndcg": 0.993867,
+      "top_1_accuracy_tie_aware": 0.542857,
+      "mrr": 0.747619,
+      "pairwise_accuracy": 0.636364,
+      "evaluated_pairs": 176
+    },
+    "v2_minus_v1": {
+      "top_1_accuracy_tie_aware": 0.0,
+      "mrr": 0.019048,
+      "pairwise_accuracy": 0.034091,
+      "ndcg": 0.000705
+    }
+  },
+  "held_out_test": {
+    "v1_pointwise": {
+      "rows": 156,
+      "context_groups": 37,
+      "evaluated_ranking_groups": 37,
+      "tied_top_groups": 18,
+      "ndcg": 0.991866,
+      "top_1_accuracy_tie_aware": 0.432432,
+      "mrr": 0.666667,
+      "pairwise_accuracy": 0.560847,
+      "evaluated_pairs": 189
+    },
+    "v2_pairwise": {
+      "rows": 156,
+      "context_groups": 37,
+      "evaluated_ranking_groups": 37,
+      "tied_top_groups": 18,
+      "ndcg": 0.993154,
+      "top_1_accuracy_tie_aware": 0.540541,
+      "mrr": 0.731338,
+      "pairwise_accuracy": 0.582011,
+      "evaluated_pairs": 189
+    },
+    "v2_minus_v1": {
+      "top_1_accuracy_tie_aware": 0.108109,
+      "mrr": 0.064671,
+      "pairwise_accuracy": 0.021164,
+      "ndcg": 0.001288
+    }
+  }
+}

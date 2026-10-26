@@ -1,0 +1,51 @@
+{
+  "model": "TF-IDF + Ridge pointwise question quality ranker",
+  "label_source": "multi_llm_consensus_pseudo_labels",
+  "dataset_rows": 1000,
+  "context_groups": 240,
+  "train_rows": 700,
+  "validation_rows": 144,
+  "test_rows": 156,
+  "train_context_groups": 168,
+  "validation_context_groups": 35,
+  "test_context_groups": 37,
+  "split_strategy": "precomputed_group_by_benchmark_case_stratified_by_stage_and_criterion",
+  "validation_metrics": {
+    "rows": 144,
+    "context_groups": 35,
+    "pseudo_label_metrics": {
+      "mae": 0.185006,
+      "rmse": 0.239949,
+      "spearman": 0.294592
+    },
+    "ndcg": 0.993162,
+    "top_1_accuracy": 0.542857,
+    "top_1_definition": "tie_aware_any_maximum_reference_score",
+    "human_audit_rows": 0,
+    "human_audit_metrics": null
+  },
+  "test_metrics": {
+    "rows": 156,
+    "context_groups": 37,
+    "pseudo_label_metrics": {
+      "mae": 0.191859,
+      "rmse": 0.262425,
+      "spearman": 0.459085
+    },
+    "ndcg": 0.991866,
+    "top_1_accuracy": 0.432432,
+    "top_1_definition": "tie_aware_any_maximum_reference_score",
+    "human_audit_rows": 0,
+    "human_audit_metrics": null
+  },
+  "pseudo_label_metrics": {
+    "mae": 0.191859,
+    "rmse": 0.262425,
+    "spearman": 0.459085
+  },
+  "ndcg": 0.991866,
+  "top_1_accuracy": 0.432432,
+  "top_1_definition": "tie_aware_any_maximum_reference_score",
+  "human_audit_test_rows": 0,
+  "human_audit_metrics": null
+}

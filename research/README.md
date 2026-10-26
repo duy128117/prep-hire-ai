@@ -18,12 +18,15 @@ CV + JD + interview state
   -> three other LLMs independently judge each answer
   -> multi-LLM consensus pseudo-labels
   -> Candidate Answer Scoring Model
-  -> stratified human audit for validation and held-out testing
+  -> owner manual review for quality control and versioned label correction
 ```
 
 AI-generated labels are **pseudo-labels**, not expert ground truth. The model that
-generated an item must not judge that same item. Human annotations are stored in
-separate audit tables and are never mixed with AI judge records.
+generated an item must not judge that same item. The current scope does not use expert
+labels or expert consensus. Optional owner manual reviews are stored separately and are
+never mixed with raw AI judge records. See
+`BAO_CAO_QUY_TRINH_DU_LIEU_VA_TRAINING_AI_V1.md` for the complete Vietnamese report
+covering the first 1,000-set generation and training run.
 
 Context-only endpoints:
 
@@ -120,12 +123,48 @@ and answer is judged by the other three selected providers.
 Configure the independent AI slots in `.env`; no extra SDK is required:
 
 ```env
+GROQ_API_KEY="your_primary_groq_api_key_here"
+GROQ_API_KEY_2="your_backup_groq_api_key_here"
+GROQ_API_KEY_3="your_third_groq_api_key_here"
+GROQ_API_KEY_4="your_fourth_groq_api_key_here"
+# Continue sequentially through GROQ_API_KEY_13.
+CLOUDFLARE_ACCOUNT_ID="your_primary_cloudflare_account_id_here"
+CLOUDFLARE_API_TOKEN="your_primary_cloudflare_api_token_here"
+CLOUDFLARE_ACCOUNT_ID_2="your_second_cloudflare_account_id_here"
+CLOUDFLARE_API_TOKEN_2="your_second_cloudflare_api_token_here"
+CLOUDFLARE_ACCOUNT_ID_3="your_third_cloudflare_account_id_here"
+CLOUDFLARE_API_TOKEN_3="your_third_cloudflare_api_token_here"
+CLOUDFLARE_ACCOUNT_ID_4="your_fourth_cloudflare_account_id_here"
+CLOUDFLARE_API_TOKEN_4="your_fourth_cloudflare_api_token_here"
+# Continue matching account/token pairs through suffix _13.
 INCEPTION_API_KEY="your_inception_api_key_here"
+INCEPTION_API_KEY_2="your_second_inception_api_key_here"
+INCEPTION_API_KEY_3="your_third_inception_api_key_here"
+INCEPTION_API_KEY_4="your_fourth_inception_api_key_here"
+# Continue sequentially through INCEPTION_API_KEY_13.
 OPENTYPHOON_API_KEY="your_opentyphoon_api_key_here"
+OPENTYPHOON_API_KEY_2="your_second_opentyphoon_api_key_here"
+OPENTYPHOON_API_KEY_3="your_third_opentyphoon_api_key_here"
+OPENTYPHOON_API_KEY_4="your_fourth_opentyphoon_api_key_here"
+# Continue sequentially through OPENTYPHOON_API_KEY_13.
 OLLAMA_API_KEY="your_ollama_cloud_api_key_here"
+OLLAMA_API_KEY_2="your_second_ollama_cloud_api_key_here"
+OLLAMA_API_KEY_3="your_third_ollama_cloud_api_key_here"
+OLLAMA_API_KEY_4="your_fourth_ollama_cloud_api_key_here"
+# Continue sequentially through OLLAMA_API_KEY_13.
 NVIDIA_API_KEY="your_nvidia_api_key_here"
+NVIDIA_API_KEY_2="your_second_nvidia_api_key_here"
+NVIDIA_API_KEY_3="your_third_nvidia_api_key_here"
+NVIDIA_API_KEY_4="your_fourth_nvidia_api_key_here"
+# Continue sequentially through NVIDIA_API_KEY_13.
 NVIDIA_NEMOTRON_MODEL="nvidia/nemotron-3-ultra-550b-a55b"
 ```
+
+Each provider has one primary credential and up to twelve sequential backups. These
+credentials still represent one AI worker, not thirteen workers. The primary key is used
+until authentication or quota exhaustion, then the process keeps using the next valid
+key. Duplicate key values are removed automatically. Cloudflare credentials must be
+filled as matching `ACCOUNT_ID_N` and `API_TOKEN_N` pairs from the same account.
 
 Seed privacy-safe synthetic candidate contexts from the public crawled JDs:
 
@@ -151,7 +190,7 @@ provider as unavailable, selects another provider from the equal pool, and retri
 same round. Generation pauses only when fewer than four providers remain. Repeated
 invalid JSON can also remove a provider from the current run. Token usage, active slots,
 failover history, and the pause reason are stored
-in `data/research/generation_checkpoint.json`. Only complete, logical-slot-balanced
+in `data/research/generation_checkpoint_v1_1.json`. Only complete, logical-slot-balanced
 rounds are committed. Optionally set `DATASET_PROVIDER_TOKEN_BUDGET` to a positive
 per-provider soft limit; zero relies on provider quota responses.
 
@@ -163,8 +202,26 @@ python -B scripts\export_weak_supervision_datasets.py
 
 Outputs:
 
-- `data/research/question_ranking_dataset.csv`
-- `data/research/answer_scoring_dataset.csv`
+- `data/research/weak_supervision_v1_1/all/question_ranking_all.csv`
+- `data/research/weak_supervision_v1_1/all/turn_evidence_all.csv`
+
+Create deterministic 70/15/15 train, validation, and held-out test partitions. The
+split is grouped by benchmark case, stratified by stage/criterion, and shared by both
+tasks, so the same CV/JD context cannot leak across partitions:
+
+```powershell
+python -B scripts\split_weak_supervision_datasets.py
+```
+
+Outputs:
+
+- `data/research/weak_supervision_v1_1/splits/question_train.csv`
+- `data/research/weak_supervision_v1_1/splits/question_validation.csv`
+- `data/research/weak_supervision_v1_1/splits/question_test.csv`
+- `data/research/weak_supervision_v1_1/splits/answer_train.csv`
+- `data/research/weak_supervision_v1_1/splits/answer_validation.csv`
+- `data/research/weak_supervision_v1_1/splits/answer_test.csv`
+- `data/research/weak_supervision_v1_1/manifest.json`
 
 Train both baseline models:
 
@@ -174,21 +231,46 @@ python -B scripts\train_weak_supervision_models.py
 
 Outputs:
 
-- `data/research/question_quality_ranker.joblib`
-- `data/research/question_quality_ranker_metrics.json`
-- `data/research/candidate_answer_scorer.joblib`
-- `data/research/candidate_answer_scorer_metrics.json`
+- `artifacts/weak_supervision/v1_1/question_quality_ranker.joblib`
+- `artifacts/weak_supervision/v1_1/question_quality_ranker_metrics.json`
+- `artifacts/weak_supervision/v1_1/candidate_answer_scorer.joblib`
+- `artifacts/weak_supervision/v1_1/candidate_answer_scorer_metrics.json`
 
-Both baseline trainers use grouped splitting by benchmark case. Generator model name
-and requested answer quality are retained only as analysis metadata and are not primary
-training features. Final research claims require performance on a human-audited,
-held-out test set; agreement with AI pseudo-labels alone only proves imitation of the
-AI jury.
+Both baseline trainers use the precomputed grouped partitions. They fit on train,
+measure validation performance, refit on train plus validation, and evaluate once on
+the held-out test set. Generator model name and requested answer quality are retained
+only as analysis metadata and are not primary training features. Metrics against the
+held-out pseudo-label test set measure imitation of the AI jury, not agreement with
+experts. The project owner may manually review flagged samples for quality control and
+create a new versioned dataset without an expert-consensus requirement. The V1.1
+answer scorer fits one independent regressor per turn-evidence criterion, using only
+rows where that criterion applies instead of inventing labels for non-applicable rows.
 
-## Legacy expert-calibration path
+Create a blind owner-review queue for the locked V1 ranker errors:
 
-The following Candidate Evaluation Calibration pipeline remains available only as an
-optional future extension when real independent expert consensus labels exist.
+```powershell
+python -B scripts\analyze_question_ranker_errors.py `
+  --dataset data\research\weak_supervision_v1_1\splits\question_test.csv `
+  --name question_ranker_v1_test
+```
+
+Train the V2 pairwise learning-to-rank candidate and benchmark it without split leakage:
+
+```powershell
+python -B scripts\export_question_pairwise_datasets.py
+python -B scripts\train_question_ranker_v2.py
+python -B scripts\benchmark_question_rankers.py
+```
+
+V2 learns ordered question pairs within each CV/JD context. Model selection uses only
+validation metrics in this order: tie-aware Top-1, MRR, pairwise accuracy, then NDCG.
+The held-out test partition is reporting-only and is never used to select V2.
+
+## Archived expert-calibration path (not used)
+
+The following Candidate Evaluation Calibration pipeline is legacy code and is not part
+of the current training scope. Weak Supervision V1 does not read these files, tables, or
+labels.
 
 Start with `data/research/calibration_dataset_template.csv`. One row represents one
 completed interview session for one candidate and one JD.
@@ -245,3 +327,53 @@ artifact by itself is not evidence of improvement.
 3. Inspect provider token usage and disagreement after each generation batch.
 4. Train the two baselines only after at least five independent context groups exist.
 5. Add STT/TTS and measure WER plus P50/P95 latency after the text workflow is stable.
+
+## Realtime trained-model integration
+
+The realtime interview flow now uses the two V1.1 artifacts:
+
+- `question_pairwise_ranker_v2.joblib` ranks up to four questions generated by
+  independent configured providers for the same CV/JD context.
+- `candidate_answer_scorer.joblib` produces seven turn-level evidence scores after
+  each answer. These are evidence signals, not a final candidate decision.
+
+Check artifact and provider readiness:
+
+```http
+GET /api/v1/interview/realtime-models/status
+```
+
+Create a normal session with multi-provider generation by setting
+`allow_external_ai=true`. Email addresses, phone numbers, and URLs are redacted before
+the question prompts are sent. CV/JD profile extraction remains local so the context is
+not sent to an additional enrichment provider.
+
+## Synthetic interview sessions
+
+Synthetic contexts are deterministic, explicitly labeled with `context_source=synthetic`,
+and must not be reported as real candidate evidence.
+
+Preview generated CV/JD contexts without using the database or external AI:
+
+```powershell
+python -B scripts\run_synthetic_interviews.py --sessions 3 --dry-run-contexts
+```
+
+Create and complete local-fallback sessions while running the trained answer scorer:
+
+```powershell
+python -B scripts\run_synthetic_interviews.py --sessions 3 --max-questions 5
+```
+
+Run the same simulation with four external question generators and local V2 ranking:
+
+```powershell
+python -B scripts\run_synthetic_interviews.py `
+  --sessions 1 `
+  --max-questions 5 `
+  --allow-external-ai
+```
+
+The external mode consumes provider quota. Failed or duplicate providers are replaced
+from the configured backup pool when possible. Session progression remains available
+through a deterministic fallback if every provider fails.

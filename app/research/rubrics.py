@@ -26,6 +26,41 @@ ANSWER_QUALITY_RUBRIC = {
 }
 
 
+TURN_EVIDENCE_RUBRIC = {
+    "scale": {"min": 1, "max": 5},
+    "criteria": {
+        "answer_relevance": (
+            "How directly the answer addresses the actual question without irrelevant padding."
+        ),
+        "technical_correctness": (
+            "Whether role-relevant technical claims are accurate and appropriately qualified."
+        ),
+        "expected_signal_coverage": (
+            "How many required answer signals are demonstrated correctly."
+        ),
+        "reasoning_quality": (
+            "Whether the answer explains a logical approach, choices, and trade-offs when applicable."
+        ),
+        "evidence_quality": (
+            "Whether examples, actions, and outcomes are concrete and credible when applicable."
+        ),
+        "clarity_conciseness": (
+            "Whether the answer is clear and sufficiently detailed without rewarding length itself."
+        ),
+        "consistency": (
+            "Whether the answer is internally consistent and compatible with the CV and prior turns."
+        ),
+    },
+    "anchors": {
+        "1": "Fails the criterion or contains a serious error.",
+        "2": "Shows limited evidence with major gaps.",
+        "3": "Acceptable basic evidence with meaningful omissions.",
+        "4": "Strong, correct, and well-supported evidence.",
+        "5": "Excellent evidence that is precise, complete, and appropriately nuanced.",
+    },
+}
+
+
 CANDIDATE_EVALUATION_RUBRIC = {
     "scale": {"min": 1, "max": 5},
     "criteria": {

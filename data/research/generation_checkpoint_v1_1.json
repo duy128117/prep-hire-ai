@@ -1,0 +1,264 @@
+{
+  "target_sets": 1000,
+  "status": "completed",
+  "completed_sets": 1000,
+  "completed_rounds": 250,
+  "providers": {
+    "groq": {
+      "model": "openai/gpt-oss-120b",
+      "calls": 1365,
+      "successful_calls": 1359,
+      "failed_calls": 6,
+      "input_tokens": 2258351,
+      "output_tokens": 1041889,
+      "total_tokens": 3300240,
+      "operations": {
+        "question_generation": {
+          "calls": 169,
+          "total_tokens": 405161
+        },
+        "answer_generation": {
+          "calls": 190,
+          "total_tokens": 373354
+        },
+        "question_judgment": {
+          "calls": 500,
+          "total_tokens": 1205137
+        },
+        "turn_evidence_judgment": {
+          "calls": 506,
+          "total_tokens": 1316588
+        }
+      }
+    },
+    "cloudflare": {
+      "model": "@cf/qwen/qwen3-30b-a3b-fp8",
+      "calls": 1918,
+      "successful_calls": 1915,
+      "failed_calls": 3,
+      "input_tokens": 3020390,
+      "output_tokens": 561635,
+      "total_tokens": 3582025,
+      "operations": {
+        "question_judgment": {
+          "calls": 702,
+          "total_tokens": 1333097
+        },
+        "turn_evidence_judgment": {
+          "calls": 699,
+          "total_tokens": 1480524
+        },
+        "question_generation": {
+          "calls": 235,
+          "total_tokens": 406839
+        },
+        "answer_generation": {
+          "calls": 282,
+          "total_tokens": 361565
+        }
+      }
+    },
+    "inception": {
+      "model": "mercury-2.5",
+      "calls": 1912,
+      "successful_calls": 1909,
+      "failed_calls": 3,
+      "input_tokens": 3069103,
+      "output_tokens": 1293974,
+      "total_tokens": 4363077,
+      "operations": {
+        "question_judgment": {
+          "calls": 696,
+          "total_tokens": 1599874
+        },
+        "turn_evidence_judgment": {
+          "calls": 694,
+          "total_tokens": 1716464
+        },
+        "question_generation": {
+          "calls": 233,
+          "total_tokens": 515905
+        },
+        "answer_generation": {
+          "calls": 289,
+          "total_tokens": 530834
+        }
+      }
+    },
+    "opentyphoon": {
+      "model": "typhoon-v2.5-30b-a3b-instruct",
+      "calls": 1968,
+      "successful_calls": 1966,
+      "failed_calls": 2,
+      "input_tokens": 3041812,
+      "output_tokens": 712966,
+      "total_tokens": 3754778,
+      "operations": {
+        "question_judgment": {
+          "calls": 699,
+          "total_tokens": 1358571
+        },
+        "turn_evidence_judgment": {
+          "calls": 699,
+          "total_tokens": 1483380
+        },
+        "question_generation": {
+          "calls": 234,
+          "total_tokens": 423698
+        },
+        "answer_generation": {
+          "calls": 336,
+          "total_tokens": 489129
+        }
+      }
+    },
+    "ollama_cloud": {
+      "model": "gemma4:31b",
+      "calls": 1329,
+      "successful_calls": 1326,
+      "failed_calls": 3,
+      "input_tokens": 2158739,
+      "output_tokens": 474135,
+      "total_tokens": 2632874,
+      "operations": {
+        "question_judgment": {
+          "calls": 467,
+          "total_tokens": 925350
+        },
+        "turn_evidence_judgment": {
+          "calls": 538,
+          "total_tokens": 1160400
+        },
+        "question_generation": {
+          "calls": 157,
+          "total_tokens": 299307
+        },
+        "answer_generation": {
+          "calls": 167,
+          "total_tokens": 247817
+        }
+      }
+    },
+    "nvidia_nemotron": {
+      "model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "calls": 0,
+      "successful_calls": 0,
+      "failed_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "operations": {}
+    }
+  },
+  "last_error": null,
+  "provider_pool": {
+    "architecture": "dynamic-round-robin-v1",
+    "candidates": [
+      {
+        "provider": "groq",
+        "model": "openai/gpt-oss-120b"
+      },
+      {
+        "provider": "cloudflare",
+        "model": "@cf/qwen/qwen3-30b-a3b-fp8"
+      },
+      {
+        "provider": "inception",
+        "model": "mercury-2.5"
+      },
+      {
+        "provider": "opentyphoon",
+        "model": "typhoon-v2.5-30b-a3b-instruct"
+      },
+      {
+        "provider": "ollama_cloud",
+        "model": "gemma4:31b"
+      },
+      {
+        "provider": "nvidia_nemotron",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b"
+      }
+    ],
+    "rotation_cursor": 1,
+    "exhausted": [
+      {
+        "provider": "groq",
+        "model": "openai/gpt-oss-120b",
+        "reason": "groq API error: Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01knd3y997ej6ayqdqmn7ypzh5` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199373, Requested 2279. Please try again in 11m53.664s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/set",
+        "at": "2026-10-01T02:04:49.404647+00:00"
+      }
+    ],
+    "failovers": [
+      {
+        "slot": "slot_2",
+        "from_provider": "ollama_cloud",
+        "from_model": "gemma4:31b",
+        "to_provider": "inception",
+        "to_model": "mercury-2.5",
+        "reason": "ollama_cloud network request failed after 3 attempts",
+        "at": "2026-09-30T20:46:22.025534+00:00"
+      },
+      {
+        "slot": "slot_1",
+        "from_provider": "groq",
+        "from_model": "openai/gpt-oss-120b",
+        "to_provider": "ollama_cloud",
+        "to_model": "gemma4:31b",
+        "reason": "groq API error: Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m3hte5t4ee2rx3hj3xhttzwb` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199397, Requested 2443. Please try again in 13m14.88s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/sett",
+        "at": "2026-09-30T23:39:14.300772+00:00"
+      },
+      {
+        "slot": "slot_3",
+        "from_provider": "groq",
+        "from_model": "openai/gpt-oss-120b",
+        "to_provider": "inception",
+        "to_model": "mercury-2.5",
+        "reason": "groq API error: Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01knd3y997ej6ayqdqmn7ypzh5` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 197593, Requested 2634. Please try again in 1m38.064s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/sett",
+        "at": "2026-10-01T00:05:00.210329+00:00"
+      },
+      {
+        "slot": "slot_2",
+        "from_provider": "groq",
+        "from_model": "openai/gpt-oss-120b",
+        "to_provider": "opentyphoon",
+        "to_model": "typhoon-v2.5-30b-a3b-instruct",
+        "reason": "groq API error: Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m3sg5sxxes58zxm3x4bttw16` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 198867, Requested 2496. Please try again in 9m48.816s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/sett",
+        "at": "2026-10-01T01:42:53.371502+00:00"
+      },
+      {
+        "slot": "slot_1",
+        "from_provider": "groq",
+        "from_model": "openai/gpt-oss-120b",
+        "to_provider": "ollama_cloud",
+        "to_model": "gemma4:31b",
+        "reason": "groq API error: Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01knd3y997ej6ayqdqmn7ypzh5` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199373, Requested 2279. Please try again in 11m53.664s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/set",
+        "at": "2026-10-01T02:04:49.404647+00:00"
+      }
+    ],
+    "active_assignments": [
+      {
+        "slot": "slot_1",
+        "provider": "inception",
+        "model": "mercury-2.5"
+      },
+      {
+        "slot": "slot_2",
+        "provider": "opentyphoon",
+        "model": "typhoon-v2.5-30b-a3b-instruct"
+      },
+      {
+        "slot": "slot_3",
+        "provider": "ollama_cloud",
+        "model": "gemma4:31b"
+      },
+      {
+        "slot": "slot_4",
+        "provider": "cloudflare",
+        "model": "@cf/qwen/qwen3-30b-a3b-fp8"
+      }
+    ]
+  },
+  "updated_at": "2026-10-01T02:22:13.424588+00:00",
+  "grouped_context_start_set": 0,
+  "context_grouping": "four_generators_same_case"
+}

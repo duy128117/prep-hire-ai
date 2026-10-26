@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "dataset_version": "weak-supervision-v1.1-question-pairs-v2",
+  "created_at": "2026-10-01T06:40:05.225728+00:00",
+  "pair_margin": 0.0,
+  "pair_definition": "preferred question has the higher multi-LLM consensus score",
+  "files": {
+    "train": {
+      "source": "data\\research\\weak_supervision_v1_1\\splits\\question_train.csv",
+      "output": "data\\research\\weak_supervision_v1_1\\pairwise\\question_pairs_train.csv",
+      "pairs": 866,
+      "skipped_tied_or_near_tied_pairs": 296,
+      "sha256": "4468ed09a16e3618a65830d49647a41c15585396a33eac68e4a81464c145bc70"
+    },
+    "validation": {
+      "source": "data\\research\\weak_supervision_v1_1\\splits\\question_validation.csv",
+      "output": "data\\research\\weak_supervision_v1_1\\pairwise\\question_pairs_validation.csv",
+      "pairs": 176,
+      "skipped_tied_or_near_tied_pairs": 56,
+      "sha256": "bdf8dfec383d3996c2e3bd76e0549c211ab141d5349bb4f26305cfc2bc512a3b"
+    },
+    "test": {
+      "source": "data\\research\\weak_supervision_v1_1\\splits\\question_test.csv",
+      "output": "data\\research\\weak_supervision_v1_1\\pairwise\\question_pairs_test.csv",
+      "pairs": 189,
+      "skipped_tied_or_near_tied_pairs": 77,
+      "sha256": "4d7809bcfbd77cba6070d325a44f375cd00e14595266befa62b01843afffecf6"
+    }
+  }
+}
