@@ -1,5 +1,8 @@
 # NextStep AI Interview Server
 
+> 📖 **Tài liệu bàn giao & Luồng hoạt động AI chi tiết cho Developer/AI tiếp nhận:**
+> Xem file [docs/AI_WORKFLOW_AND_MODELS.md](docs/AI_WORKFLOW_AND_MODELS.md) để nắm toàn bộ luồng hoạt động, cấu trúc 2 mô hình machine learning (`.joblib`), các API tích hợp và hướng dẫn chạy nhanh.
+
 The active research direction is an AI interview pipeline built from structured CV/JD
 context, adaptive questions, multi-LLM weak supervision, human audit, question ranking,
 and candidate-answer scoring. AI consensus labels are treated as pseudo-labels, not as
